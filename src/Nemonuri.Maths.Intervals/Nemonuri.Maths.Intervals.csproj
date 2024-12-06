@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- NugetConfig -->
+    <Import Project="$(NugetConfigDirectory)CommunityToolkit.Diagnostics.props" />  
+  <!-- /NugetConfig -->
+
 </Project>

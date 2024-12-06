@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup Label="Pack">
-    <RepositoryUrl>https://github.com/nemonuri/managed-pointers</RepositoryUrl>
+    <RepositoryUrl>https://github.com/nemonuri/maths</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>0.0.1</Version>
   </PropertyGroup>
