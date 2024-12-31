@@ -34,9 +34,8 @@ public static class GenericNumberIntervalTheory
     public static void MoveForward<TNumber, TInterval>
     (
         this TInterval interval,
-        TNumber number,
-        EndpointKind leftEndpointKind = EndpointKind.Close,
-        EndpointKind rightEndpointKind = EndpointKind.Open
+        TNumber currentValue,
+        TNumber addingValue
     )
         where TNumber : INumber<TNumber>
         where TInterval : IInterval<TNumber>

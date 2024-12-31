@@ -1,5 +1,4 @@
 namespace Nemonuri.Maths.Intervals;
-#endif
 
 public enum EndpointKind
 {
@@ -7,3 +6,4 @@ public enum EndpointKind
     Open = 1,
     Close = 2
 }
+
