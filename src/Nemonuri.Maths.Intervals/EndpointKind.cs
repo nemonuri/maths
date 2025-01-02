@@ -2,8 +2,7 @@ namespace Nemonuri.Maths.Intervals;
 
 public enum EndpointKind
 {
-    Unknown = 0,
-    Open = 1,
-    Close = 2
+    Close = 1,
+    Open = 2
 }
 
