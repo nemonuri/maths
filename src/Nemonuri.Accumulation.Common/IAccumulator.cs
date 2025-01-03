@@ -6,8 +6,3 @@ public interface IAccumulator<out T, TNumber>
 
     bool Accumulate(TNumber number);
 }
-
-public interface IAccumulatable<out T, TNumber>
-{
-    IAccumulator<T, TNumber> GetAccumulator();
-}
