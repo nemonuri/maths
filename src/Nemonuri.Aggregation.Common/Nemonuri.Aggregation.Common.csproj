@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Nemonuri.Aggregation</RootNamespace>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../Directory.Pack.props" />
+
+  <!-- ConfigDirectory -->
+    <Import Project="$(ConfigDirectory)Pack.Common.props" />
+  <!-- /ConfigDirectory -->
+
+</Project>
