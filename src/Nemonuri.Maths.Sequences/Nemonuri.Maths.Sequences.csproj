@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- NugetConfig -->
+    <Import Project="$(NugetConfigDirectory)CommunityToolkit.Diagnostics.props" />  
+  <!-- /NugetConfig -->
+
+  <!-- Pack -->
+    <Import Project="$(ConfigDirectory)Pack.Common.props" />
+    <Import Project="$(MSBuildThisFileDirectory)../Directory.Pack.props" />
+  <!-- /Pack -->
+
+</Project>

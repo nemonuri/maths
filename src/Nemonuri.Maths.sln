@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nemonuri.Maths.Intervals", "Nemonuri.Maths.Intervals\Nemonuri.Maths.Intervals.csproj", "{566E500D-7071-43B4-855A-B9E67C82F345}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nemonuri.Accumulation.Common", "Nemonuri.Accumulation.Common\Nemonuri.Accumulation.Common.csproj", "{4F685612-CB70-4DAB-A0D3-621E464BF0AF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nemonuri.Aggregation.Common", "Nemonuri.Aggregation.Common\Nemonuri.Aggregation.Common.csproj", "{027B1F94-CAE3-4000-89A7-F1FA251AF243}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nemonuri.Maths.Sequences", "Nemonuri.Maths.Sequences\Nemonuri.Maths.Sequences.csproj", "{7909305A-C152-4C0D-9012-C21728884267}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,17 +14,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{566E500D-7071-43B4-855A-B9E67C82F345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{566E500D-7071-43B4-855A-B9E67C82F345}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{566E500D-7071-43B4-855A-B9E67C82F345}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{566E500D-7071-43B4-855A-B9E67C82F345}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F685612-CB70-4DAB-A0D3-621E464BF0AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F685612-CB70-4DAB-A0D3-621E464BF0AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F685612-CB70-4DAB-A0D3-621E464BF0AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F685612-CB70-4DAB-A0D3-621E464BF0AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{027B1F94-CAE3-4000-89A7-F1FA251AF243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{027B1F94-CAE3-4000-89A7-F1FA251AF243}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{027B1F94-CAE3-4000-89A7-F1FA251AF243}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{027B1F94-CAE3-4000-89A7-F1FA251AF243}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7909305A-C152-4C0D-9012-C21728884267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7909305A-C152-4C0D-9012-C21728884267}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7909305A-C152-4C0D-9012-C21728884267}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7909305A-C152-4C0D-9012-C21728884267}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
