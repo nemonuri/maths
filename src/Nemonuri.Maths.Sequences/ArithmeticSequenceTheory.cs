@@ -34,12 +34,14 @@ public static class ArithmeticSequenceTheory
     public static int GetBoundedIndexInRationalNumberSystem<TNumber>
     (
         int unboundedIndex,
-        TNumber sudoIndexMinusUnboundedIndex
+        TNumber sudoIndexMinusUnboundedIndex,
+        RawStructBoundary<TNumber> leftBoundary,
+        RawStructBoundary<TNumber> rightBoundary
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-
+        
     }
 
 

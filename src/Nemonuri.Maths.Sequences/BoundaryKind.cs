@@ -6,4 +6,3 @@ public enum BoundaryKind
     Close = 1,
     Open = 2
 }
-
