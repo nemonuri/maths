@@ -35,13 +35,67 @@ public static class ArithmeticSequenceTheory
     (
         int unboundedIndex,
         TNumber sudoIndexMinusUnboundedIndex,
-        RawStructBoundary<TNumber> leftBoundary,
-        RawStructBoundary<TNumber> rightBoundary
+        RawStructIndexBoundary<TNumber> leftBoundary,
+        RawStructIndexBoundary<TNumber> rightBoundary
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-        
+        //--- 왼쪽 경계 점검 ---
+        if (leftBoundary.BoundaryKind == BoundaryKind.None)
+        {
+            goto RightBoundary;
+        }
+
+        int anchorIndexMinusOne = leftBoundary.AnchorIndex - 1;
+        if (anchorIndexMinusOne < unboundedIndex)
+        {
+            goto RightBoundary;
+        }
+        else if (anchorIndexMinusOne == unboundedIndex)
+        {
+            goto Label1;
+        }
+        else if (anchorIndexMinusOne > unboundedIndex)
+        {
+            goto OutOfRange;
+        }
+        else
+        {
+            return ThrowHelper.ThrowInvalidOperationException<int>();
+        }
+        //---|
+
+    Label1:
+        //--- 왼쪽 경계 판정 ---
+        if (leftBoundary.BoundaryKind == BoundaryKind.Close)
+        {
+            if (sudoIndexMinusUnboundedIndex < )
+            {
+
+            }
+        }
+        else if (leftBoundary.BoundaryKind == BoundaryKind.Open)
+        {
+
+        }
+        else
+        {
+            //--- 오류 ---
+
+            //---|
+        }
+        //---|
+
+    RightBoundary:
+        //--- 오른쪽 경계 점검 ---
+        throw new NotImplementedException();
+        //---|
+    
+    OutOfRange:
+        //--- 벗어남 판정 ---
+        throw new NotImplementedException();
+        //---|
     }
 
 
