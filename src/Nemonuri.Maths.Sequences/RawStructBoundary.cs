@@ -1,11 +1,19 @@
 namespace Nemonuri.Maths.Sequences;
 
-#if NET7_0_OR_GREATER
+
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct RawStructIndexBoundary<TNumber> //where TNumber : IFloatingPoint<TNumber>
+public struct RawStructIndexBoundary<TNumber> where TNumber : IComparable<TNumber>
 {
     public BoundaryKind BoundaryKind;
     public int AnchorIndex;
-    public TNumber Tolerance;
+    public TNumber ResidualTolerance;
 }
-#endif
+
+[Flags]
+public enum CompareConditions
+{
+    None = 0,
+    Less = 1 << 0,
+    Equal = 1 << 1,
+    Greater = 1 << 2
+}

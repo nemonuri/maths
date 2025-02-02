@@ -17,24 +17,38 @@ public static class ArithmeticSequenceTheory
         return v1 - v2;
     }
 
-    public static int GetUnboundedIndexFromSudoIndexInRationalNumberSystem<TNumber>
+    public static int GetUnboundedIndexUsingFloorInRationalNumberSystem<TNumber>
     (
         TNumber sudoIndex,
         Func<TNumber, int> indexCaster,
-        out TNumber sudoIndexMinusUnboundedIndex
+        out TNumber outResidual
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
         var unboundedIndex = TNumber.Floor(sudoIndex);
-        sudoIndexMinusUnboundedIndex = sudoIndex - unboundedIndex;
+        outResidual = sudoIndex - unboundedIndex;
+        return indexCaster.Invoke(unboundedIndex);
+    }
+
+    public static int GetUnboundedIndexUsingCeilingInRationalNumberSystem<TNumber>
+    (
+        TNumber sudoIndex,
+        Func<TNumber, int> indexCaster,
+        out TNumber outResidual
+    )
+        where TNumber : 
+            IFloatingPoint<TNumber>
+    {
+        var unboundedIndex = TNumber.Ceiling(sudoIndex);
+        outResidual = unboundedIndex - sudoIndex;
         return indexCaster.Invoke(unboundedIndex);
     }
 
     public static int GetBoundedIndexInRationalNumberSystem<TNumber>
     (
         int unboundedIndex,
-        TNumber sudoIndexMinusUnboundedIndex,
+        TNumber residual,
         RawStructIndexBoundary<TNumber> leftBoundary,
         RawStructIndexBoundary<TNumber> rightBoundary
     )
@@ -42,55 +56,114 @@ public static class ArithmeticSequenceTheory
             IFloatingPoint<TNumber>
     {
         //--- 왼쪽 경계 점검 ---
-        if (leftBoundary.BoundaryKind == BoundaryKind.None)
         {
-            goto RightBoundary;
-        }
+            if (leftBoundary.BoundaryKind == BoundaryKind.None)
+            {
+                goto RightBoundary;
+            }
 
-        int anchorIndexMinusOne = leftBoundary.AnchorIndex - 1;
-        if (anchorIndexMinusOne < unboundedIndex)
-        {
-            goto RightBoundary;
-        }
-        else if (anchorIndexMinusOne == unboundedIndex)
-        {
-            goto Label1;
-        }
-        else if (anchorIndexMinusOne > unboundedIndex)
-        {
-            goto OutOfRange;
-        }
-        else
-        {
-            return ThrowHelper.ThrowInvalidOperationException<int>();
+            int anchorIndex = leftBoundary.AnchorIndex;
+            if (anchorIndex < unboundedIndex)
+            {
+                goto RightBoundary;
+            }
+            else if (anchorIndex >= unboundedIndex)
+            {
+                goto Label1;
+            }
+            else
+            {
+                return ThrowHelper.ThrowInvalidOperationException<int>();
+            }
         }
         //---|
 
     Label1:
-        //--- 왼쪽 경계 판정 ---
-        if (leftBoundary.BoundaryKind == BoundaryKind.Close)
         {
-            if (sudoIndexMinusUnboundedIndex < )
+            //--- 왼쪽 경계 판정 ---
+            bool isResidualInTolerance;
+
+            if (leftBoundary.BoundaryKind == BoundaryKind.Close)
             {
-
+                isResidualInTolerance = residual <= leftBoundary.ResidualTolerance;
             }
-        }
-        else if (leftBoundary.BoundaryKind == BoundaryKind.Open)
-        {
+            else if (leftBoundary.BoundaryKind == BoundaryKind.Open)
+            {
+                isResidualInTolerance = residual < leftBoundary.ResidualTolerance;
+            }
+            else
+            {
+                return ThrowHelper.ThrowInvalidOperationException<int>();
+            }
+            //---|
 
-        }
-        else
-        {
-            //--- 오류 ---
-
+            //--- 왼쪽 경계로 값 맞추기 ---
+            if (isResidualInTolerance)
+            {
+                return leftBoundary.AnchorIndex;
+            }
+            else
+            {
+                goto OutOfRange;
+            }
             //---|
         }
-        //---|
+
 
     RightBoundary:
         //--- 오른쪽 경계 점검 ---
-        throw new NotImplementedException();
+        {
+            if (rightBoundary.BoundaryKind == BoundaryKind.None)
+            {
+                return unboundedIndex;
+            }
+
+            int anchorIndex = rightBoundary.AnchorIndex;
+            if (anchorIndex < unboundedIndex)
+            {
+                return unboundedIndex;
+            }
+            else if (anchorIndex >= unboundedIndex)
+            {
+                goto Label2;
+            }
+            else
+            {
+                return ThrowHelper.ThrowInvalidOperationException<int>();
+            }
+        }
         //---|
+
+    Label2:
+        {
+            //--- 오른쪽 경계 판정 ---
+            bool isResidualInTolerance;
+
+            if (rightBoundary.BoundaryKind == BoundaryKind.Close)
+            {
+                isResidualInTolerance = residual <= rightBoundary.ResidualTolerance;
+            }
+            else if (rightBoundary.BoundaryKind == BoundaryKind.Open)
+            {
+                isResidualInTolerance = residual < rightBoundary.ResidualTolerance;
+            }
+            else
+            {
+                return ThrowHelper.ThrowInvalidOperationException<int>();
+            }
+            //---|
+
+            //--- 오른쪽 경계로 값 맞추기 ---
+            if (isResidualInTolerance)
+            {
+                return rightBoundary.AnchorIndex;
+            }
+            else
+            {
+                goto OutOfRange;
+            }
+            //---|
+        }
     
     OutOfRange:
         //--- 벗어남 판정 ---
@@ -113,7 +186,7 @@ public static class ArithmeticSequenceTheory
             IFloatingPoint<TNumber>
     {
         var sudoIndex = GetSudoIndexInRationalNumberSystem(value, first, difference);
-        return GetUnboundedIndexFromSudoIndexInRationalNumberSystem(sudoIndex, indexCaster, out sudoIndexMinusUnboundedIndex);
+        return GetUnboundedIndexUsingFloorInRationalNumberSystem(sudoIndex, indexCaster, out sudoIndexMinusUnboundedIndex);
     }
 
 
