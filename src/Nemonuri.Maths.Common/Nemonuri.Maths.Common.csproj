@@ -4,11 +4,11 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Nemonuri.Maths</RootNamespace>
   </PropertyGroup>
 
   <!-- NugetConfig -->
     <Import Project="$(NugetConfigDirectory)CommunityToolkit.Diagnostics.props" />  
-    <Import Project="$(NugetConfigDirectory)Nemonuri.Maths.Common.props" /> 
   <!-- /NugetConfig -->
 
   <!-- Pack -->

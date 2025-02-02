@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nemonuri.Maths.Sequences", "Nemonuri.Maths.Sequences\Nemonuri.Maths.Sequences.csproj", "{7909305A-C152-4C0D-9012-C21728884267}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nemonuri.Maths.Common", "Nemonuri.Maths.Common\Nemonuri.Maths.Common.csproj", "{37A8A4A3-8E44-49FD-A23D-747022364AA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{7909305A-C152-4C0D-9012-C21728884267}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7909305A-C152-4C0D-9012-C21728884267}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7909305A-C152-4C0D-9012-C21728884267}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37A8A4A3-8E44-49FD-A23D-747022364AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37A8A4A3-8E44-49FD-A23D-747022364AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37A8A4A3-8E44-49FD-A23D-747022364AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37A8A4A3-8E44-49FD-A23D-747022364AA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

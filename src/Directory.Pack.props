@@ -128,10 +128,10 @@
   <ItemGroup Label="Package Metadata">
     
     <!-- Including icon file info package. -->
-    <None Include="$(MSBuildThisFileDirectory)Directory.Pack.Resources\icon_128x128.png" Pack="true" PackagePath=""/>
+    <None Include="$(MSBuildThisFileDirectory)Directory.Pack.Resources\icon_128x128.png" Pack="true" PackagePath="" Visible="false"/>
 
     <!-- Including readme file info package. -->
-    <None Include="$(MSBuildThisFileDirectory)Directory.Pack.Resources\README.md" Pack="true" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)Directory.Pack.Resources\README.md" Pack="true" PackagePath="" Visible="false"/>
     
   </ItemGroup>
 

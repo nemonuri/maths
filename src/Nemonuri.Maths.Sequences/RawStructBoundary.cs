@@ -7,13 +7,28 @@ public struct RawStructIndexBoundary<TNumber> where TNumber : IComparable<TNumbe
     public BoundaryKind BoundaryKind;
     public int AnchorIndex;
     public TNumber ResidualTolerance;
-}
 
-[Flags]
-public enum CompareConditions
-{
-    None = 0,
-    Less = 1 << 0,
-    Equal = 1 << 1,
-    Greater = 1 << 2
+    public IndexContainingState IsContainingIndex()
+    {
+
+    }
+
+    private readonly bool IsContainingIndexInMain(int otherIndex, CompareConditions compareConditions) =>
+        CompareTheory.IsSatisfyingCompareConditions(AnchorIndex, otherIndex, compareConditions);
+
+    private readonly bool IsContainingIndexInResidualTolerance(TNumber residual)
+    {
+        if (BoundaryKind == BoundaryKind.Close)
+        {
+            return residual.CompareTo(ResidualTolerance) <= 0;
+        }
+        else if (BoundaryKind == BoundaryKind.Open)
+        {
+            return residual.CompareTo(ResidualTolerance) < 0;
+        }
+        else
+        {
+            return ThrowHelper.ThrowInvalidOperationException<bool>();
+        }
+    }
 }
