@@ -8,15 +8,33 @@ public struct RawStructIndexBoundary<TNumber> where TNumber : IComparable<TNumbe
     public int AnchorIndex;
     public TNumber ResidualTolerance;
 
-    public IndexContainingState IsContainingIndex()
+    public RawStructIndexBoundary(BoundaryKind boundaryKind, int anchorIndex, TNumber residualTolerance)
     {
-
+        BoundaryKind = boundaryKind;
+        AnchorIndex = anchorIndex;
+        ResidualTolerance = residualTolerance;
     }
 
-    private readonly bool IsContainingIndexInMain(int otherIndex, CompareConditions compareConditions) =>
+    public readonly BoundaryHavingState GetHavingState(int index, TNumber residual, BoundaryDirection direction)
+    {
+        if (HasIndexInMain(index, direction.ToCompareConditions()))
+        {
+            return BoundaryHavingState.Main;
+        }
+        else if (HasIndexInResidualTolerance(residual))
+        {
+            return BoundaryHavingState.ResidualTolerance;
+        }
+        else
+        {
+            return BoundaryHavingState.None;
+        }
+    }
+
+    public readonly bool HasIndexInMain(int otherIndex, CompareConditions compareConditions) =>
         CompareTheory.IsSatisfyingCompareConditions(AnchorIndex, otherIndex, compareConditions);
 
-    private readonly bool IsContainingIndexInResidualTolerance(TNumber residual)
+    public readonly bool HasIndexInResidualTolerance(TNumber residual)
     {
         if (BoundaryKind == BoundaryKind.Close)
         {

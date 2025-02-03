@@ -1,6 +1,6 @@
 namespace Nemonuri.Maths.Sequences;
 
-public enum IndexContainingState
+public enum BoundaryHavingState
 {
     None = 0,
     Main = 1,

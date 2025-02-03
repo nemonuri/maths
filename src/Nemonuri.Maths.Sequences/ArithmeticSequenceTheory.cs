@@ -56,118 +56,27 @@ public static class ArithmeticSequenceTheory
             IFloatingPoint<TNumber>
     {
         //--- 왼쪽 경계 점검 ---
+        switch (leftBoundary.GetHavingState(unboundedIndex, residual, BoundaryDirection.Left))
         {
-            if (leftBoundary.BoundaryKind == BoundaryKind.None)
-            {
-                goto RightBoundary;
-            }
-
-            int anchorIndex = leftBoundary.AnchorIndex;
-            if (anchorIndex < unboundedIndex)
-            {
-                goto RightBoundary;
-            }
-            else if (anchorIndex >= unboundedIndex)
-            {
-                goto Label1;
-            }
-            else
-            {
-                return ThrowHelper.ThrowInvalidOperationException<int>();
-            }
-        }
-        //---|
-
-    Label1:
-        {
-            //--- 왼쪽 경계 판정 ---
-            bool isResidualInTolerance;
-
-            if (leftBoundary.BoundaryKind == BoundaryKind.Close)
-            {
-                isResidualInTolerance = residual <= leftBoundary.ResidualTolerance;
-            }
-            else if (leftBoundary.BoundaryKind == BoundaryKind.Open)
-            {
-                isResidualInTolerance = residual < leftBoundary.ResidualTolerance;
-            }
-            else
-            {
-                return ThrowHelper.ThrowInvalidOperationException<int>();
-            }
-            //---|
-
-            //--- 왼쪽 경계로 값 맞추기 ---
-            if (isResidualInTolerance)
-            {
+            case BoundaryHavingState.Main:
+                break;
+            case BoundaryHavingState.ResidualTolerance:
                 return leftBoundary.AnchorIndex;
-            }
-            else
-            {
-                goto OutOfRange;
-            }
-            //---|
-        }
-
-
-    RightBoundary:
-        //--- 오른쪽 경계 점검 ---
-        {
-            if (rightBoundary.BoundaryKind == BoundaryKind.None)
-            {
-                return unboundedIndex;
-            }
-
-            int anchorIndex = rightBoundary.AnchorIndex;
-            if (anchorIndex < unboundedIndex)
-            {
-                return unboundedIndex;
-            }
-            else if (anchorIndex >= unboundedIndex)
-            {
-                goto Label2;
-            }
-            else
-            {
+            default:
                 return ThrowHelper.ThrowInvalidOperationException<int>();
-            }
         }
         //---|
 
-    Label2:
+        //--- 오른쪽 경계 점검 ---
+        switch (rightBoundary.GetHavingState(unboundedIndex, residual, BoundaryDirection.Right))
         {
-            //--- 오른쪽 경계 판정 ---
-            bool isResidualInTolerance;
-
-            if (rightBoundary.BoundaryKind == BoundaryKind.Close)
-            {
-                isResidualInTolerance = residual <= rightBoundary.ResidualTolerance;
-            }
-            else if (rightBoundary.BoundaryKind == BoundaryKind.Open)
-            {
-                isResidualInTolerance = residual < rightBoundary.ResidualTolerance;
-            }
-            else
-            {
-                return ThrowHelper.ThrowInvalidOperationException<int>();
-            }
-            //---|
-
-            //--- 오른쪽 경계로 값 맞추기 ---
-            if (isResidualInTolerance)
-            {
+            case BoundaryHavingState.Main:
+                return unboundedIndex;
+            case BoundaryHavingState.ResidualTolerance:
                 return rightBoundary.AnchorIndex;
-            }
-            else
-            {
-                goto OutOfRange;
-            }
-            //---|
+            default:
+                return ThrowHelper.ThrowInvalidOperationException<int>();
         }
-    
-    OutOfRange:
-        //--- 벗어남 판정 ---
-        throw new NotImplementedException();
         //---|
     }
 
