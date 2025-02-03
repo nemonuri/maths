@@ -1,9 +1,9 @@
 ﻿namespace Nemonuri.Maths.Sequences;
 
-public static class ArithmeticSequenceTheory
+public static partial class RationalArithmeticSequenceTheory
 {
 #if NET7_0_OR_GREATER
-    public static TNumber GetSudoIndexInRationalNumberSystem<TNumber>
+    public static TNumber GetSudoIndex<TNumber>
     (
         TNumber value,
         TNumber first,
@@ -17,7 +17,7 @@ public static class ArithmeticSequenceTheory
         return v1 - v2;
     }
 
-    public static int GetUnboundedIndexUsingFloorInRationalNumberSystem<TNumber>
+    public static int GetUnboundedIndexUsingFloor<TNumber>
     (
         TNumber sudoIndex,
         Func<TNumber, int> indexCaster,
@@ -31,7 +31,7 @@ public static class ArithmeticSequenceTheory
         return indexCaster.Invoke(unboundedIndex);
     }
 
-    public static int GetUnboundedIndexUsingCeilingInRationalNumberSystem<TNumber>
+    public static int GetUnboundedIndexUsingCeiling<TNumber>
     (
         TNumber sudoIndex,
         Func<TNumber, int> indexCaster,
@@ -45,7 +45,7 @@ public static class ArithmeticSequenceTheory
         return indexCaster.Invoke(unboundedIndex);
     }
 
-    public static int GetBoundedIndexInRationalNumberSystem<TNumber>
+    public static int GetBoundedIndex<TNumber>
     (
         int unboundedIndex,
         TNumber residual,
@@ -80,27 +80,36 @@ public static class ArithmeticSequenceTheory
         //---|
     }
 
-
-
-
-    public static int GetUnboundedIndexInRationalNumberSystem<TNumber>
+    public static int GetUnboundedIndex<TNumber>
     (
         TNumber value,
         TNumber first,
         TNumber difference,
         Func<TNumber, int> indexCaster,
-        out TNumber sudoIndexMinusUnboundedIndex
+        out TNumber residual
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-        var sudoIndex = GetSudoIndexInRationalNumberSystem(value, first, difference);
-        return GetUnboundedIndexUsingFloorInRationalNumberSystem(sudoIndex, indexCaster, out sudoIndexMinusUnboundedIndex);
+        var sudoIndex = GetSudoIndex(value, first, difference);
+        return GetUnboundedIndexUsingFloor(sudoIndex, indexCaster, out residual);
     }
 
+    public static int GetBoundedIndex<TNumber>
+    (
+        TNumber value,
+        TNumber first,
+        TNumber difference,
+        Func<TNumber, int> indexCaster,
+        RawStructIndexBoundary<TNumber> leftBoundary,
+        RawStructIndexBoundary<TNumber> rightBoundary
+    )
+        where TNumber : 
+            IFloatingPoint<TNumber>
 
 
-    public static TNumber GetIndexInRationalNumberSystem<TNumber>
+
+    public static TNumber GetIndex<TNumber>
     (
         TNumber value,
         TNumber first,
