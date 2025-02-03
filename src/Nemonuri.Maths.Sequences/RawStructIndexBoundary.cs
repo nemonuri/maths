@@ -1,6 +1,13 @@
 namespace Nemonuri.Maths.Sequences;
 
 
+public struct RawStructIndexAndResidual<TNumber> where TNumber : IComparable<TNumber>
+{
+    public ResidualDirection ResidualDirection;
+    public int Index;
+    public TNumber Residual;
+}
+
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct RawStructIndexBoundary<TNumber> where TNumber : IComparable<TNumber>
 {

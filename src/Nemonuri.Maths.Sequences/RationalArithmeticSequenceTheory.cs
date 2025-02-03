@@ -17,34 +17,6 @@ public static partial class RationalArithmeticSequenceTheory
         return v1 - v2;
     }
 
-    public static int GetUnboundedIndexUsingFloor<TNumber>
-    (
-        TNumber sudoIndex,
-        Func<TNumber, int> indexCaster,
-        out TNumber outResidual
-    )
-        where TNumber : 
-            IFloatingPoint<TNumber>
-    {
-        var unboundedIndex = TNumber.Floor(sudoIndex);
-        outResidual = sudoIndex - unboundedIndex;
-        return indexCaster.Invoke(unboundedIndex);
-    }
-
-    public static int GetUnboundedIndexUsingCeiling<TNumber>
-    (
-        TNumber sudoIndex,
-        Func<TNumber, int> indexCaster,
-        out TNumber outResidual
-    )
-        where TNumber : 
-            IFloatingPoint<TNumber>
-    {
-        var unboundedIndex = TNumber.Ceiling(sudoIndex);
-        outResidual = unboundedIndex - sudoIndex;
-        return indexCaster.Invoke(unboundedIndex);
-    }
-
     public static int GetBoundedIndex<TNumber>
     (
         int unboundedIndex,
