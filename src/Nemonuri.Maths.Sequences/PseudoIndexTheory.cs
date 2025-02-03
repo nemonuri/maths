@@ -107,20 +107,46 @@ public static class PseudoIndexTheory
         }
     }
 
-    public static bool TryGetMainBoundaryValueIfPositionKindIsResidualTolerance<TNumber>
+    public static bool TryGetValueIfPositionKindIsResidualToleranceLike<TNumber>
     (
         PseudoIndexPositionKind positionKind,
         TNumber leftMainBoundary,
+        bool isBoundaryOfLeftResidualToleranceAndMainClosed,
+        bool isBoundaryOfLeftOutsideAndLeftResidualToleranceClosed,
         TNumber rightMainBoundary,
+        bool isBoundaryOfMainAndRightResidualToleranceClosed,
+        bool isBoundaryOfRightResidualToleranceAndRightOutsideClosed,
         out TNumber outValue
     )
     {
-        if (positionKind == PseudoIndexPositionKind.LeftOutside)
+        if 
+        (
+            positionKind == PseudoIndexPositionKind.LeftOutside ||
+            (
+                isBoundaryOfLeftResidualToleranceAndMainClosed &&
+                positionKind == PseudoIndexPositionKind.BoundaryOfLeftResidualToleranceAndMain
+            ) ||
+            (
+                isBoundaryOfLeftOutsideAndLeftResidualToleranceClosed &&
+                positionKind == PseudoIndexPositionKind.BoundaryOfLeftOutsideAndLeftResidualTolerance
+            )
+        )
         {
             outValue = leftMainBoundary;
             return true;
         }
-        else if (positionKind == PseudoIndexPositionKind.RightOutside)
+        else if 
+        (
+            positionKind == PseudoIndexPositionKind.RightOutside ||
+            (
+                isBoundaryOfMainAndRightResidualToleranceClosed &&
+                positionKind == PseudoIndexPositionKind.BoundaryOfMainAndRightResidualTolerance
+            ) ||
+            (
+                isBoundaryOfRightResidualToleranceAndRightOutsideClosed &&
+                positionKind == PseudoIndexPositionKind.BoundaryOfRightResidualToleranceAndRightOutside
+            )
+        )
         {
             outValue = rightMainBoundary;
             return true;
@@ -128,6 +154,34 @@ public static class PseudoIndexTheory
         else
         {
             outValue = default!;
+            return false;
+        }
+    }
+
+    public static bool IsPositionKindMainLike
+    (
+        PseudoIndexPositionKind positionKind,
+        bool isBoundaryOfLeftResidualToleranceAndMainClosed,
+        bool isBoundaryOfMainAndRightResidualToleranceClosed
+    )
+    {
+        if
+        (
+            positionKind == PseudoIndexPositionKind.Main ||
+            (
+                isBoundaryOfLeftResidualToleranceAndMainClosed &&
+                positionKind == PseudoIndexPositionKind.BoundaryOfLeftResidualToleranceAndMain
+            ) ||
+            (
+                isBoundaryOfMainAndRightResidualToleranceClosed &&
+                positionKind == PseudoIndexPositionKind.BoundaryOfMainAndRightResidualTolerance
+            )
+        )
+        {
+            return true;
+        }
+        else
+        {
             return false;
         }
     }
