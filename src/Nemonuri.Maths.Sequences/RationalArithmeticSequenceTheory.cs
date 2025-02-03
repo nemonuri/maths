@@ -17,7 +17,20 @@ public static partial class RationalArithmeticSequenceTheory
         return v1 - v2;
     }
 
-    //public static TNumber 
+    public static bool TryGetNormalizedIndex<TNumber>
+    (
+
+    )
+    {
+        //--- 경계선에 맞추기 ---
+        //---|
+
+        //--- 정규화(정수화) ---
+        //---|
+
+        //--- 유효성 확인(Main에 포함되는지?) ---
+        //---|
+    }
 
     public static int GetBoundedIndex<TNumber>
     (

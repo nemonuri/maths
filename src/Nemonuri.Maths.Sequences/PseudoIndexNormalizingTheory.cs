@@ -21,13 +21,13 @@ public static class PseudoIndexNormalizingTheory
     public static TNumber Normalize<TNumber>
     (
         TNumber pseudoIndex,
-        PseudoIndexNormalizingMethodKind normalizingMethodKind,
+        PseudoIndexNormalizingMethodKind methodKind,
         out TNumber outResidual
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-        switch (normalizingMethodKind)
+        switch (methodKind)
         {
             case PseudoIndexNormalizingMethodKind.Floor:
                 {
@@ -48,68 +48,47 @@ public static class PseudoIndexNormalizingTheory
         }
     }
 
-    public static int GetIndex<TNumber>
+    public static TNumber Normalize<TNumber>
     (
-        TNumber sudoIndex,
-        PseudoIndexNormalizingMethodKind mappingKind,
-        Func<TNumber, int> indexCaster,
-        out TNumber outResidual
-    )
-        where TNumber : 
-            IFloatingPoint<TNumber>
-    {
-        Guard.IsNotNull(indexCaster);
-
-        var v1 = Normalize(sudoIndex, mappingKind, out outResidual);
-        return indexCaster.Invoke(v1);
-    }
-
-    public static int GetIndex<TNumber>
-    (
-        TNumber sudoIndex,
-        PseudoIndexNormalizingMethodKind mappingKind,
+        TNumber pseudoIndex,
+        PseudoIndexNormalizingMethodKind methodKind,
         PseudoIndexNormalizer<TNumber>? mapper,
-        Func<TNumber, int> indexCaster,
         out TNumber outResidual
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-        if (mappingKind == PseudoIndexNormalizingMethodKind.Custom)
+        if (methodKind == PseudoIndexNormalizingMethodKind.Custom)
         {
             Guard.IsNotNull(mapper);
-            return Normalize(sudoIndex, mapper, indexCaster, out outResidual);
+            return mapper.Invoke(pseudoIndex, out outResidual);
         }
         else
         {
-            return GetIndex(sudoIndex, mappingKind, indexCaster, out outResidual);
+            return Normalize(pseudoIndex, methodKind, out outResidual);
         }
     }
 
-    public static int GetIndexInRationalNumberSystem<TNumber>
+    public static TNumber GetNormalizedIndexInRationalNumberSystem<TNumber>
     (
         this PseudoIndexNormalizingMethodUnion<TNumber> self,
         TNumber value,
         TNumber first,
         TNumber difference,
-        Func<TNumber, int> indexCaster,
         out TNumber outResidual
     )
         where TNumber : IFloatingPoint<TNumber>
     {
-        Guard.IsNotNull(indexCaster);
-
-        TNumber sudoIndex = RationalArithmeticSequenceTheory.GetPseudoIndex(value, first, difference);
-        int unboundedIndex = 
-            GetIndex
+        TNumber pseudoIndex = RationalArithmeticSequenceTheory.GetPseudoIndex(value, first, difference);
+        TNumber normalizedIndex = 
+            Normalize
             (
-                sudoIndex, 
+                pseudoIndex, 
                 self.MappingKind, 
-                self.CustomMapper, 
-                indexCaster, 
+                self.CustomMapper,
                 out outResidual
             );
-        return unboundedIndex;
+        return normalizedIndex;
     }
 
 #endif
