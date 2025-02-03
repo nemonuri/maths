@@ -17,11 +17,25 @@ public static partial class RationalArithmeticSequenceTheory
         return v1 - v2;
     }
 
-    public static bool TryGetNormalizedIndex<TNumber>
+    public static bool TryGetNormalizedIndex
+    <
+        TRaw,
+        TPseudoIndex,
+        TFormalIndex
+    >
     (
-
+        TRaw raw,
+        Func<TRaw, TPseudoIndex> rawToPseudoIndexMapping,
+        TPseudoIndex leftResidualToleranceBoundary,
+        TPseudoIndex leftMainBoundary,
+        TPseudoIndex rightMainBoundary,
+        TPseudoIndex rightResidualToleranceBoundary
     )
     {
+        //--- 날것 데이터를 유사 인데스로 변환 ---
+        TPseudoIndex pseudoIndex = rawToPseudoIndexMapping.Invoke(raw);
+        //---|
+
         //--- 경계선에 맞추기 ---
         //---|
 
