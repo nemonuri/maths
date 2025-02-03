@@ -3,7 +3,7 @@
 public static partial class RationalArithmeticSequenceTheory
 {
 #if NET7_0_OR_GREATER
-    public static TNumber GetSudoIndex<TNumber>
+    public static TNumber GetPseudoIndex<TNumber>
     (
         TNumber value,
         TNumber first,
@@ -16,6 +16,8 @@ public static partial class RationalArithmeticSequenceTheory
         var v2 = TNumber.One / (TNumber.One + TNumber.One);
         return v1 - v2;
     }
+
+    //public static TNumber 
 
     public static int GetBoundedIndex<TNumber>
     (
@@ -63,7 +65,7 @@ public static partial class RationalArithmeticSequenceTheory
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-        var sudoIndex = GetSudoIndex(value, first, difference);
+        var sudoIndex = GetPseudoIndex(value, first, difference);
         return GetUnboundedIndexUsingFloor(sudoIndex, indexCaster, out residual);
     }
 

@@ -1,8 +1,8 @@
 namespace Nemonuri.Maths.Sequences;
 
-public delegate TNumber SudoIndexToIntegerMapper<TNumber>
+public delegate TNumber PseudoIndexNormalizer<TNumber>
 (
-    TNumber sudoIndex,
+    TNumber pseudoIndex,
     out TNumber outResidual
 )
 #if NET9_0_OR_GREATER

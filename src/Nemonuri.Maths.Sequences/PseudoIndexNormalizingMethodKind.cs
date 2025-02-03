@@ -1,6 +1,6 @@
 namespace Nemonuri.Maths.Sequences;
 
-public enum SudoIndexToIntegerMappingKind
+public enum PseudoIndexNormalizingMethodKind
 {
     Custom = 0,
     Floor = 1,

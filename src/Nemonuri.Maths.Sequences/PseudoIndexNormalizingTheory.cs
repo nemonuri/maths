@@ -1,47 +1,45 @@
-using System.Security.Cryptography.X509Certificates;
-
 namespace Nemonuri.Maths.Sequences;
 
-public static class SudoIndexToIntegerTheory
+public static class PseudoIndexNormalizingTheory
 {
-    public static int GetUnboundedIndex<TNumber>
+    public static int Normalize<TNumber>
     (
-        TNumber sudoIndex,
-        SudoIndexToIntegerMapper<TNumber> mapper,
+        TNumber pseudoIndex,
+        PseudoIndexNormalizer<TNumber> normalizer,
         Func<TNumber, int> indexCaster,
         out TNumber outResidual
     )
     {
-        Guard.IsNotNull(mapper);
+        Guard.IsNotNull(normalizer);
         Guard.IsNotNull(indexCaster);
 
-        TNumber v1 = mapper.Invoke(sudoIndex, out outResidual);
+        TNumber v1 = normalizer.Invoke(pseudoIndex, out outResidual);
         return indexCaster.Invoke(v1);
     }
 
 #if NET7_0_OR_GREATER
-    public static TNumber GetUnboundedIndex<TNumber>
+    public static TNumber Normalize<TNumber>
     (
-        TNumber sudoIndex,
-        SudoIndexToIntegerMappingKind mappingKind,
+        TNumber pseudoIndex,
+        PseudoIndexNormalizingMethodKind normalizingMethodKind,
         out TNumber outResidual
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-        switch (mappingKind)
+        switch (normalizingMethodKind)
         {
-            case SudoIndexToIntegerMappingKind.Floor:
+            case PseudoIndexNormalizingMethodKind.Floor:
                 {
-                    var unboundedIndex = TNumber.Floor(sudoIndex);
-                    outResidual = sudoIndex - unboundedIndex;
+                    var unboundedIndex = TNumber.Floor(pseudoIndex);
+                    outResidual = pseudoIndex - unboundedIndex;
                     return unboundedIndex;
                 }
 
-            case SudoIndexToIntegerMappingKind.Ceiling:
+            case PseudoIndexNormalizingMethodKind.Ceiling:
                 {
-                    var unboundedIndex = TNumber.Ceiling(sudoIndex);
-                    outResidual = unboundedIndex - sudoIndex;
+                    var unboundedIndex = TNumber.Ceiling(pseudoIndex);
+                    outResidual = unboundedIndex - pseudoIndex;
                     return unboundedIndex;
                 }
             default:
@@ -50,10 +48,10 @@ public static class SudoIndexToIntegerTheory
         }
     }
 
-    public static int GetUnboundedIndex<TNumber>
+    public static int GetIndex<TNumber>
     (
         TNumber sudoIndex,
-        SudoIndexToIntegerMappingKind mappingKind,
+        PseudoIndexNormalizingMethodKind mappingKind,
         Func<TNumber, int> indexCaster,
         out TNumber outResidual
     )
@@ -62,35 +60,35 @@ public static class SudoIndexToIntegerTheory
     {
         Guard.IsNotNull(indexCaster);
 
-        var v1 = GetUnboundedIndex(sudoIndex, mappingKind, out outResidual);
+        var v1 = Normalize(sudoIndex, mappingKind, out outResidual);
         return indexCaster.Invoke(v1);
     }
 
-    public static int GetUnboundedIndex<TNumber>
+    public static int GetIndex<TNumber>
     (
         TNumber sudoIndex,
-        SudoIndexToIntegerMappingKind mappingKind,
-        SudoIndexToIntegerMapper<TNumber>? mapper,
+        PseudoIndexNormalizingMethodKind mappingKind,
+        PseudoIndexNormalizer<TNumber>? mapper,
         Func<TNumber, int> indexCaster,
         out TNumber outResidual
     )
         where TNumber : 
             IFloatingPoint<TNumber>
     {
-        if (mappingKind == SudoIndexToIntegerMappingKind.Custom)
+        if (mappingKind == PseudoIndexNormalizingMethodKind.Custom)
         {
             Guard.IsNotNull(mapper);
-            return GetUnboundedIndex(sudoIndex, mapper, indexCaster, out outResidual);
+            return Normalize(sudoIndex, mapper, indexCaster, out outResidual);
         }
         else
         {
-            return GetUnboundedIndex(sudoIndex, mappingKind, indexCaster, out outResidual);
+            return GetIndex(sudoIndex, mappingKind, indexCaster, out outResidual);
         }
     }
 
-    public static int GetUnboundedIndexInRationalNumberSystem<TNumber>
+    public static int GetIndexInRationalNumberSystem<TNumber>
     (
-        this SudoIndexToIntegerMappingUnion<TNumber> self,
+        this PseudoIndexNormalizingMethodUnion<TNumber> self,
         TNumber value,
         TNumber first,
         TNumber difference,
@@ -101,9 +99,9 @@ public static class SudoIndexToIntegerTheory
     {
         Guard.IsNotNull(indexCaster);
 
-        TNumber sudoIndex = RationalArithmeticSequenceTheory.GetSudoIndex(value, first, difference);
+        TNumber sudoIndex = RationalArithmeticSequenceTheory.GetPseudoIndex(value, first, difference);
         int unboundedIndex = 
-            GetUnboundedIndex
+            GetIndex
             (
                 sudoIndex, 
                 self.MappingKind, 
