@@ -1,6 +1,6 @@
 namespace Nemonuri.Maths.Sequences;
 
-public enum PseudoIndexPositionSubKind : int
+public enum TolerantIntervalSectionSubKind : int
 {
     #region Boundary, (Not Boundary)
         Boundary = 1 << 0,
@@ -13,6 +13,6 @@ public enum PseudoIndexPositionSubKind : int
 
     #region Main, ResidualTolerance, (Outside)
         Main = 1 << 3,
-        ResidualTolerance = 1 << 4,
+        Tolerance = 1 << 4,
     #endregion
 }

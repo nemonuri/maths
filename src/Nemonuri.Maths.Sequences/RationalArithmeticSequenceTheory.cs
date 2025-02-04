@@ -20,29 +20,100 @@ public static partial class RationalArithmeticSequenceTheory
     public static bool TryGetNormalizedIndex
     <
         TRaw,
-        TPseudoIndex,
-        TFormalIndex
+        TPseudoIndex
     >
     (
-        TRaw raw,
-        Func<TRaw, TPseudoIndex> rawToPseudoIndexMapping,
-        TPseudoIndex leftResidualToleranceBoundary,
-        TPseudoIndex leftMainBoundary,
-        TPseudoIndex rightMainBoundary,
-        TPseudoIndex rightResidualToleranceBoundary
+        TRaw rawValue,
+
+#region Section Data
+        TRaw leftToleranceBoundary,
+        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
+
+        TRaw leftMainBoundary,
+        BoundaryClosedDirection leftMainBoundaryClosedDirection,
+
+        TRaw rightMainBoundary,
+        BoundaryClosedDirection rightMainBoundaryClosedDirection,
+
+        TRaw rightToleranceBoundary,
+        BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
+#endregion Section Data
+
+        Func<TRaw, TPseudoIndex> rawToNormalizedIndexMapping,
+
+        TPseudoIndex leftToleranceAlternativeIndex,
+        TPseudoIndex rightToleranceAlternativeIndex,
+
+        [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
     )
+        where TRaw : IComparable<TRaw>
+        where TPseudoIndex : IComparable<TPseudoIndex>
     {
-        //--- 날것 데이터를 유사 인데스로 변환 ---
-        TPseudoIndex pseudoIndex = rawToPseudoIndexMapping.Invoke(raw);
+        Guard.IsNotNull(rawToNormalizedIndexMapping);
+
+        //--- 날값의 구획상 위치 상태를 얻기 ---
+        TolerantIntervalSectionKind sectionKind = 
+            TolerantIntervalTheory.GetSectionKind
+            (
+                rawValue,
+                leftToleranceBoundary,
+                leftMainBoundary,
+                rightMainBoundary,
+                rightToleranceBoundary
+            );
         //---|
 
-        //--- 경계선에 맞추기 ---
+        //--- 구획상 위치 상태로부터, 허용 오차 구획 여부 및 종류 얻기 ---
+        ToleranceDirection toleranceDirection = 
+            sectionKind.GetToleranceDirection
+            (
+                isBoundaryOfLeftOutsideAndLeftToleranceClosed: leftToleranceBoundaryClosedDirection == BoundaryClosedDirection.Right,
+                isBoundaryOfLeftToleranceAndMainClosed: leftMainBoundaryClosedDirection == BoundaryClosedDirection.Left,
+                isBoundaryOfMainAndRightToleranceClosed: rightMainBoundaryClosedDirection == BoundaryClosedDirection.Right,
+                isBoundaryOfRightToleranceAndRightOutsideClosed: rightToleranceBoundaryClosedDirection == BoundaryClosedDirection.Left
+            );
         //---|
 
-        //--- 정규화(정수화) ---
+        //--- 허용 오차 구획일 경우, 값 성공적으로 반환하기 ---
+        if (toleranceDirection == ToleranceDirection.Left)
+        {
+            outNormalizedIndex = leftToleranceAlternativeIndex;
+            return true;
+        }
+        else if (toleranceDirection == ToleranceDirection.Right)
+        {
+            outNormalizedIndex = rightToleranceAlternativeIndex;
+            return true;
+        }
         //---|
 
-        //--- 유효성 확인(Main에 포함되는지?) ---
+        //--- 바탕 구획일 경우, 정규화된 인덱스로 반환하기 ---
+        if
+        (
+            sectionKind.IsMainLike
+            (
+                isBoundaryOfLeftToleranceAndMainClosed: leftMainBoundaryClosedDirection == BoundaryClosedDirection.Right,
+                isBoundaryOfMainAndRightToleranceClosed: rightMainBoundaryClosedDirection == BoundaryClosedDirection.Left
+            )
+        )
+        {
+            outNormalizedIndex = rawToNormalizedIndexMapping(rawValue);
+        }
+        //---|
+
+        //--- 바깥 영역일 경우, 실패 반환하기 ---
+        if (sectionKind.IsOutside())
+        {
+            outNormalizedIndex = default;
+            return false;
+        }
+        //---|
+
+        //--- 여기 도달했을 경우, 섹션 종류가 잘못되었다는 오류 던지기
+        {
+            outNormalizedIndex = default;
+            return ThrowHelper.ThrowInvalidOperationException<bool>(/* TODO */);
+        }
         //---|
     }
 
