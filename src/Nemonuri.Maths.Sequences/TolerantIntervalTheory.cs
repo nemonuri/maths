@@ -197,54 +197,101 @@ public static class TolerantIntervalTheory
         }
     }
 
-    public static bool TryGetValueIfPositionKindIsResidualToleranceLike<TNumber>
+    public static bool TryGetNormalizedIndex<TRaw, TPseudoIndex, TArg>
     (
-        TolerantIntervalSectionKind positionKind,
-        TNumber leftMainBoundary,
-        bool isBoundaryOfLeftResidualToleranceAndMainClosed,
-        bool isBoundaryOfLeftOutsideAndLeftResidualToleranceClosed,
-        TNumber rightMainBoundary,
-        bool isBoundaryOfMainAndRightResidualToleranceClosed,
-        bool isBoundaryOfRightResidualToleranceAndRightOutsideClosed,
-        out TNumber outValue
+        TRaw rawValue,
+
+#region Tolerant Interval
+        TRaw leftToleranceBoundary,
+        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
+
+        TRaw leftMainBoundary,
+        BoundaryClosedDirection leftMainBoundaryClosedDirection,
+
+        TRaw rightMainBoundary,
+        BoundaryClosedDirection rightMainBoundaryClosedDirection,
+
+        TRaw rightToleranceBoundary,
+        BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
+#endregion Tolerant Interval
+
+        Func<TRaw, TArg?, TPseudoIndex> rawToNormalizedIndexMapping,
+        TArg? mappingExtraArg,
+
+        TPseudoIndex leftToleranceAlternativeIndex,
+        TPseudoIndex rightToleranceAlternativeIndex,
+
+        [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
     )
+        where TRaw : IComparable<TRaw>
+        where TPseudoIndex : IComparable<TPseudoIndex>
     {
-        if 
+        Guard.IsNotNull(rawToNormalizedIndexMapping);
+
+        //--- 날값의 구획상 위치 상태를 얻기 ---
+        TolerantIntervalSectionKind sectionKind = 
+            GetSectionKind
+            (
+                rawValue,
+                leftToleranceBoundary,
+                leftMainBoundary,
+                rightMainBoundary,
+                rightToleranceBoundary
+            );
+        //---|
+
+        //--- 구획상 위치 상태로부터, 허용 오차 구획 여부 및 종류 얻기 ---
+        ToleranceDirection toleranceDirection = 
+            sectionKind.GetToleranceDirection
+            (
+                isBoundaryOfLeftOutsideAndLeftToleranceClosed: leftToleranceBoundaryClosedDirection == BoundaryClosedDirection.Right,
+                isBoundaryOfLeftToleranceAndMainClosed: leftMainBoundaryClosedDirection == BoundaryClosedDirection.Left,
+                isBoundaryOfMainAndRightToleranceClosed: rightMainBoundaryClosedDirection == BoundaryClosedDirection.Right,
+                isBoundaryOfRightToleranceAndRightOutsideClosed: rightToleranceBoundaryClosedDirection == BoundaryClosedDirection.Left
+            );
+        //---|
+
+        //--- 허용 오차 구획일 경우, 값 성공적으로 반환하기 ---
+        if (toleranceDirection == ToleranceDirection.Left)
+        {
+            outNormalizedIndex = leftToleranceAlternativeIndex;
+            return true;
+        }
+        else if (toleranceDirection == ToleranceDirection.Right)
+        {
+            outNormalizedIndex = rightToleranceAlternativeIndex;
+            return true;
+        }
+        //---|
+
+        //--- 바탕 구획일 경우, 정규화된 인덱스로 반환하기 ---
+        if
         (
-            positionKind == TolerantIntervalSectionKind.LeftOutside ||
+            sectionKind.IsMainLike
             (
-                isBoundaryOfLeftResidualToleranceAndMainClosed &&
-                positionKind == TolerantIntervalSectionKind.BoundaryOfLeftToleranceAndMain
-            ) ||
-            (
-                isBoundaryOfLeftOutsideAndLeftResidualToleranceClosed &&
-                positionKind == TolerantIntervalSectionKind.BoundaryOfLeftOutsideAndLeftTolerance
+                isBoundaryOfLeftToleranceAndMainClosed: leftMainBoundaryClosedDirection == BoundaryClosedDirection.Right,
+                isBoundaryOfMainAndRightToleranceClosed: rightMainBoundaryClosedDirection == BoundaryClosedDirection.Left
             )
         )
         {
-            outValue = leftMainBoundary;
+            outNormalizedIndex = rawToNormalizedIndexMapping(rawValue, mappingExtraArg);
             return true;
         }
-        else if 
-        (
-            positionKind == TolerantIntervalSectionKind.RightOutside ||
-            (
-                isBoundaryOfMainAndRightResidualToleranceClosed &&
-                positionKind == TolerantIntervalSectionKind.BoundaryOfMainAndRightTolerance
-            ) ||
-            (
-                isBoundaryOfRightResidualToleranceAndRightOutsideClosed &&
-                positionKind == TolerantIntervalSectionKind.BoundaryOfRightToleranceAndRightOutside
-            )
-        )
+        //---|
+
+        //--- 바깥 영역일 경우, 실패 반환하기 ---
+        if (sectionKind.IsOutside())
         {
-            outValue = rightMainBoundary;
-            return true;
-        }
-        else
-        {
-            outValue = default!;
+            outNormalizedIndex = default;
             return false;
         }
+        //---|
+
+        //--- 여기 도달했을 경우, 섹션 종류가 잘못되었다는 오류 던지기
+        {
+            outNormalizedIndex = default;
+            return ThrowHelper.ThrowInvalidOperationException<bool>(/* TODO */);
+        }
+        //---|
     }
 }

@@ -9,112 +9,40 @@ public static partial class RationalArithmeticSequenceTheory
         TNumber first,
         TNumber difference
     )
-        where TNumber : 
-            IFloatingPoint<TNumber>
+        where TNumber : IFloatingPoint<TNumber>
     {
         var v1 = (value - first)/difference;
         var v2 = TNumber.One / (TNumber.One + TNumber.One);
         return v1 - v2;
     }
 
-    public static bool TryGetNormalizedIndex
-    <
-        TRaw,
-        TPseudoIndex
-    >
+    public static bool TryGetNormalizedIndex<TNumber>
     (
-        TRaw rawValue,
+        TNumber value,
+        TNumber first,
+        TNumber difference,
 
-#region Section Data
-        TRaw leftToleranceBoundary,
+#region Tolerant Interval
+        TNumber leftToleranceBoundary,
         BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
 
-        TRaw leftMainBoundary,
+        TNumber leftMainBoundary,
         BoundaryClosedDirection leftMainBoundaryClosedDirection,
 
-        TRaw rightMainBoundary,
+        TNumber rightMainBoundary,
         BoundaryClosedDirection rightMainBoundaryClosedDirection,
 
-        TRaw rightToleranceBoundary,
+        TNumber rightToleranceBoundary,
         BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
-#endregion Section Data
+#endregion Tolerant Interval
 
-        Func<TRaw, TPseudoIndex> rawToNormalizedIndexMapping,
+        Func<TNumber, TNumber> rawToNormalizedIndexMapping,
 
-        TPseudoIndex leftToleranceAlternativeIndex,
-        TPseudoIndex rightToleranceAlternativeIndex,
-
-        [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
+        [NotNullWhen(true)] out TNumber? outNormalizedIndex
     )
-        where TRaw : IComparable<TRaw>
-        where TPseudoIndex : IComparable<TPseudoIndex>
+        where TNumber : IFloatingPoint<TNumber>
     {
         Guard.IsNotNull(rawToNormalizedIndexMapping);
-
-        //--- 날값의 구획상 위치 상태를 얻기 ---
-        TolerantIntervalSectionKind sectionKind = 
-            TolerantIntervalTheory.GetSectionKind
-            (
-                rawValue,
-                leftToleranceBoundary,
-                leftMainBoundary,
-                rightMainBoundary,
-                rightToleranceBoundary
-            );
-        //---|
-
-        //--- 구획상 위치 상태로부터, 허용 오차 구획 여부 및 종류 얻기 ---
-        ToleranceDirection toleranceDirection = 
-            sectionKind.GetToleranceDirection
-            (
-                isBoundaryOfLeftOutsideAndLeftToleranceClosed: leftToleranceBoundaryClosedDirection == BoundaryClosedDirection.Right,
-                isBoundaryOfLeftToleranceAndMainClosed: leftMainBoundaryClosedDirection == BoundaryClosedDirection.Left,
-                isBoundaryOfMainAndRightToleranceClosed: rightMainBoundaryClosedDirection == BoundaryClosedDirection.Right,
-                isBoundaryOfRightToleranceAndRightOutsideClosed: rightToleranceBoundaryClosedDirection == BoundaryClosedDirection.Left
-            );
-        //---|
-
-        //--- 허용 오차 구획일 경우, 값 성공적으로 반환하기 ---
-        if (toleranceDirection == ToleranceDirection.Left)
-        {
-            outNormalizedIndex = leftToleranceAlternativeIndex;
-            return true;
-        }
-        else if (toleranceDirection == ToleranceDirection.Right)
-        {
-            outNormalizedIndex = rightToleranceAlternativeIndex;
-            return true;
-        }
-        //---|
-
-        //--- 바탕 구획일 경우, 정규화된 인덱스로 반환하기 ---
-        if
-        (
-            sectionKind.IsMainLike
-            (
-                isBoundaryOfLeftToleranceAndMainClosed: leftMainBoundaryClosedDirection == BoundaryClosedDirection.Right,
-                isBoundaryOfMainAndRightToleranceClosed: rightMainBoundaryClosedDirection == BoundaryClosedDirection.Left
-            )
-        )
-        {
-            outNormalizedIndex = rawToNormalizedIndexMapping(rawValue);
-        }
-        //---|
-
-        //--- 바깥 영역일 경우, 실패 반환하기 ---
-        if (sectionKind.IsOutside())
-        {
-            outNormalizedIndex = default;
-            return false;
-        }
-        //---|
-
-        //--- 여기 도달했을 경우, 섹션 종류가 잘못되었다는 오류 던지기
-        {
-            outNormalizedIndex = default;
-            return ThrowHelper.ThrowInvalidOperationException<bool>(/* TODO */);
-        }
-        //---|
     }
 
     public static int GetBoundedIndex<TNumber>
