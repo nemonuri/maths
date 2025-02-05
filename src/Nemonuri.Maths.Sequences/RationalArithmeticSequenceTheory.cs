@@ -34,5 +34,34 @@ public static partial class RationalArithmeticSequenceTheory
         var v2 = v1 + leftTolerance;
         return v2;
     }
+
+    public static TNumber GetItem<TNumber>
+    (
+        TNumber pseudoIndex,
+        TNumber first,
+        TNumber difference
+    )
+        where TNumber : IFloatingPoint<TNumber>
+    {
+        var v1 = pseudoIndex * difference;
+        var v2 = v1 + first;
+        return v2;
+    }
+
+    public static RationalArithmeticSequence<TNumber> Create<TNumber>
+    (
+        TNumber first,
+        TNumber closedLast,
+        TNumber difference,
+        TNumber leftTolerance
+    )
+    {
+
+    }
 #endif
+}
+
+public class RationalArithmeticSequence<TNumber>
+{
+
 }

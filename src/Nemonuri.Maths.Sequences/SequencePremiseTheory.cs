@@ -31,7 +31,7 @@ public static class SequencePremiseTheory
         }
     }
 
-    public static int GetIndex<T>(this IIndexGetableSequencePremise<T> self, T item)
+    public static int GetIndex<T>(this IInversibleSequencePremise<T> self, T item)
 #if NET9_0_OR_GREATER
         where T : allows ref struct
 #endif
@@ -49,25 +49,6 @@ public static class SequencePremiseTheory
         }
     }
 
-    public static bool MoveNext<T>(this ISequencePremise<T> self, ref T current)
-        where T : struct
-    {
-        Guard.IsNotNull(self);
-
-        return self.TryGetNext(current, out current);
-    }
-
-    public static bool MoveNext<T>(this ISequencePremise<T> self, T? current)
-#if NET9_0_OR_GREATER
-        where T : allows ref struct
-#endif
-    {
-        Guard.IsNotNull(self);
-
-        return self.TryGetNext(current, out _);
-    }
-
-
     public static bool MoveNext<T>
     (
         this ISequencePremise<T> self, 
@@ -81,7 +62,7 @@ public static class SequencePremiseTheory
         if 
         (
             index < self.Count &&
-            self.TryGetNext(current, out current)
+            self.TryGetSuccessor(current, out current)
         )
         {
             SetNextIndex(ref index);
@@ -109,7 +90,7 @@ public static class SequencePremiseTheory
         if 
         (
             index < self.Count &&
-            self.TryGetNext(current, out _)
+            self.TryGetSuccessor(current, out _)
         )
         {
             SetNextIndex(ref index);
