@@ -197,7 +197,14 @@ public static class TolerantIntervalTheory
         }
     }
 
-    public static bool TryGetNormalizedIndex<TRaw, TPseudoIndex, TArg>
+    public static bool TryGetNormalizedIndex
+    <
+        TRaw,
+        TPseudoIndex,
+        TArg1,
+        TArg2,
+        TArg3
+    >
     (
         TRaw rawValue,
 
@@ -215,11 +222,20 @@ public static class TolerantIntervalTheory
         BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
 #endregion Tolerant Interval
 
-        Func<TRaw, TArg?, TPseudoIndex> rawToNormalizedIndexMapping,
-        TArg? mappingExtraArg,
+        Func<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
+        TArg1? rawToNormalizedIndexMappingArg,
 
-        TPseudoIndex leftToleranceAlternativeIndex,
-        TPseudoIndex rightToleranceAlternativeIndex,
+#region Tolerance Alternative Index
+        ToleranceAlternativeIndexMode leftToleranceAlternativeIndexMode,
+        TPseudoIndex? leftToleranceAlternativeIndex,
+        Func<TRaw, TArg2?, TPseudoIndex>? leftToleranceAlternativeMapping,
+        TArg2? leftToleranceAlternativeMappingArg,
+        
+        ToleranceAlternativeIndexMode rightToleranceAlternativeIndexMode,
+        TPseudoIndex? rightToleranceAlternativeIndex,
+        Func<TRaw, TArg3?, TPseudoIndex>? rightToleranceAlternativeMapping,
+        TArg3? rightToleranceAlternativeMappingArg,
+#endregion Tolerance Alternative Index
 
         [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
     )
@@ -254,13 +270,37 @@ public static class TolerantIntervalTheory
         //--- 허용 오차 구획일 경우, 값 성공적으로 반환하기 ---
         if (toleranceDirection == ToleranceDirection.Left)
         {
-            outNormalizedIndex = leftToleranceAlternativeIndex;
-            return true;
+            //--- 왼쪽 값 구하기 ---
+            return
+                TryGetToleranceAlternativeIndex
+                (
+                    leftMainBoundary,
+                    rawToNormalizedIndexMapping,
+                    rawToNormalizedIndexMappingArg,
+                    leftToleranceAlternativeIndexMode,
+                    leftToleranceAlternativeIndex,
+                    leftToleranceAlternativeMapping,
+                    leftToleranceAlternativeMappingArg,
+                    out outNormalizedIndex
+                );
+            //---|
         }
         else if (toleranceDirection == ToleranceDirection.Right)
         {
-            outNormalizedIndex = rightToleranceAlternativeIndex;
-            return true;
+            //--- 오른쪽 값 구하기 ---
+            return
+                TryGetToleranceAlternativeIndex
+                (
+                    rightMainBoundary,
+                    rawToNormalizedIndexMapping,
+                    rawToNormalizedIndexMappingArg,
+                    rightToleranceAlternativeIndexMode,
+                    rightToleranceAlternativeIndex,
+                    rightToleranceAlternativeMapping,
+                    rightToleranceAlternativeMappingArg,
+                    out outNormalizedIndex
+                );
+            //---|
         }
         //---|
 
@@ -274,7 +314,7 @@ public static class TolerantIntervalTheory
             )
         )
         {
-            outNormalizedIndex = rawToNormalizedIndexMapping(rawValue, mappingExtraArg);
+            outNormalizedIndex = rawToNormalizedIndexMapping(rawValue, rawToNormalizedIndexMappingArg);
             return true;
         }
         //---|
@@ -293,5 +333,49 @@ public static class TolerantIntervalTheory
             return ThrowHelper.ThrowInvalidOperationException<bool>(/* TODO */);
         }
         //---|
+    }
+
+    private static bool TryGetToleranceAlternativeIndex
+    <
+        TRaw, 
+        TPseudoIndex, 
+        TArg1, 
+        TArg2
+    >
+    (
+        TRaw leftMainBoundary,
+        Func<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
+        TArg1? rawToNormalizedIndexMappingArg,
+        ToleranceAlternativeIndexMode toleranceAlternativeIndexMode,
+        TPseudoIndex? toleranceAlternativeIndex,
+        Func<TRaw, TArg2?, TPseudoIndex>? toleranceAlternativeMapping,
+        TArg2? toleranceAlternativeMappingArg,
+        [NotNullWhen(true)] out TPseudoIndex? outIndex
+    )
+        where TRaw : IComparable<TRaw>
+        where TPseudoIndex : IComparable<TPseudoIndex>
+    {
+        if (toleranceAlternativeIndexMode == ToleranceAlternativeIndexMode.Default)
+        {
+            outIndex = rawToNormalizedIndexMapping.Invoke(leftMainBoundary, rawToNormalizedIndexMappingArg);
+            return true;
+        }
+        else if (toleranceAlternativeIndexMode == ToleranceAlternativeIndexMode.AlternativeIndex)
+        {
+            Guard.IsNotNull(toleranceAlternativeIndex);
+            outIndex = toleranceAlternativeIndex;
+            return true;
+        }
+        else if (toleranceAlternativeIndexMode == ToleranceAlternativeIndexMode.AlternativeMapping)
+        {
+            Guard.IsNotNull(toleranceAlternativeMapping);
+            outIndex = toleranceAlternativeMapping.Invoke(leftMainBoundary, toleranceAlternativeMappingArg);
+            return true;
+        }
+        else
+        {
+            outIndex = default;
+            return false;
+        }
     }
 }

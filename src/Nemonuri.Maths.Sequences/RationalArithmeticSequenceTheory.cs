@@ -3,6 +3,9 @@
 public static partial class RationalArithmeticSequenceTheory
 {
 #if NET7_0_OR_GREATER
+    /// <note>
+    /// GetPseudoIndex(value, first, difference, 1/2) 과 이론적으로 동일
+    /// </note>
     public static TNumber GetPseudoIndex<TNumber>
     (
         TNumber value,
@@ -16,130 +19,20 @@ public static partial class RationalArithmeticSequenceTheory
         return v1 - v2;
     }
 
-    public static bool TryGetNormalizedIndex<TNumber>
+    public static TNumber GetPseudoIndex<TNumber>
     (
         TNumber value,
         TNumber first,
         TNumber difference,
-
-#region Tolerant Interval
-        TNumber leftToleranceBoundary,
-        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
-
-        TNumber leftMainBoundary,
-        BoundaryClosedDirection leftMainBoundaryClosedDirection,
-
-        TNumber rightMainBoundary,
-        BoundaryClosedDirection rightMainBoundaryClosedDirection,
-
-        TNumber rightToleranceBoundary,
-        BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
-#endregion Tolerant Interval
-
-        Func<TNumber, TNumber> rawToNormalizedIndexMapping,
-
-        [NotNullWhen(true)] out TNumber? outNormalizedIndex
+        TNumber leftTolerance
     )
         where TNumber : IFloatingPoint<TNumber>
     {
-        Guard.IsNotNull(rawToNormalizedIndexMapping);
-    }
+        Guard.IsInRange(leftTolerance, TNumber.Zero, TNumber.One);
 
-    public static int GetBoundedIndex<TNumber>
-    (
-        int unboundedIndex,
-        TNumber residual,
-        RawStructIndexBoundary<TNumber> leftBoundary,
-        RawStructIndexBoundary<TNumber> rightBoundary
-    )
-        where TNumber : 
-            IFloatingPoint<TNumber>
-    {
-        //--- 왼쪽 경계 점검 ---
-        switch (leftBoundary.GetHavingState(unboundedIndex, residual, BoundaryDirection.Left))
-        {
-            case BoundaryHavingState.Main:
-                break;
-            case BoundaryHavingState.ResidualTolerance:
-                return leftBoundary.AnchorIndex;
-            default:
-                return ThrowHelper.ThrowInvalidOperationException<int>();
-        }
-        //---|
-
-        //--- 오른쪽 경계 점검 ---
-        switch (rightBoundary.GetHavingState(unboundedIndex, residual, BoundaryDirection.Right))
-        {
-            case BoundaryHavingState.Main:
-                return unboundedIndex;
-            case BoundaryHavingState.ResidualTolerance:
-                return rightBoundary.AnchorIndex;
-            default:
-                return ThrowHelper.ThrowInvalidOperationException<int>();
-        }
-        //---|
-    }
-
-    public static int GetUnboundedIndex<TNumber>
-    (
-        TNumber value,
-        TNumber first,
-        TNumber difference,
-        Func<TNumber, int> indexCaster,
-        out TNumber residual
-    )
-        where TNumber : 
-            IFloatingPoint<TNumber>
-    {
-        var sudoIndex = GetPseudoIndex(value, first, difference);
-        return GetUnboundedIndexUsingFloor(sudoIndex, indexCaster, out residual);
-    }
-
-    public static int GetBoundedIndex<TNumber>
-    (
-        TNumber value,
-        TNumber first,
-        TNumber difference,
-        Func<TNumber, int> indexCaster,
-        RawStructIndexBoundary<TNumber> leftBoundary,
-        RawStructIndexBoundary<TNumber> rightBoundary
-    )
-        where TNumber : 
-            IFloatingPoint<TNumber>
-
-
-
-    public static TNumber GetIndex<TNumber>
-    (
-        TNumber value,
-        TNumber first,
-        TNumber difference,
-        TNumber leftTolerance,
-        TNumber rightTolerance,
-        BoundaryKind leftBoundaryKind = BoundaryKind.Close,
-        BoundaryKind rightBoundaryKind = BoundaryKind.Open
-    )
-        where TNumber : IFloatingPoint<TNumber>
-    {
         var v1 = (value - first)/difference;
-        var v2 = TNumber.One / (TNumber.One + TNumber.One);
-        var middleValue = v1 - v2;
-
-        TNumber leftValue, rightValue, flooredValue;
-
-        flooredValue = TNumber.Floor(middleValue);
-
-        //--- underflow
-        if (flooredValue < TNumber.Zero)
-        {
-
-        }
-        //---|
-
-        //--- overflow
-        //else if ()
-        //---|
-        
+        var v2 = v1 + leftTolerance;
+        return v2;
     }
 #endif
 }
