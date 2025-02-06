@@ -43,4 +43,28 @@ public static class CompareTheory
 
         return true;
     }
+
+    public static bool IsBetween<T>(T subject, T other1, T other2)
+        where T : 
+            IComparable<T>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+    {
+        return
+            other1.CompareTo(other2) switch
+            {
+                0 => subject.CompareTo(other1) == 0,
+                < 0 => 
+                    (
+                        other1.CompareTo(subject) >= 0 &&
+                        subject.CompareTo(other2) <= 0
+                    ),
+                > 0 => 
+                    (
+                        other2.CompareTo(subject) >= 0 &&
+                        subject.CompareTo(other1) <= 0
+                    )
+            };
+    }
 }
