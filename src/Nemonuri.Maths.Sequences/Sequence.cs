@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace Nemonuri.Maths.Sequences;
 
 public class Sequence<T> : IReadOnlyList<T>

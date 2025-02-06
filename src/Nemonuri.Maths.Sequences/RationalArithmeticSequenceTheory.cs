@@ -47,21 +47,5 @@ public static partial class RationalArithmeticSequenceTheory
         var v2 = v1 + first;
         return v2;
     }
-
-    public static RationalArithmeticSequence<TNumber> Create<TNumber>
-    (
-        TNumber first,
-        TNumber closedLast,
-        TNumber difference,
-        TNumber leftTolerance
-    )
-    {
-
-    }
 #endif
-}
-
-public class RationalArithmeticSequence<TNumber>
-{
-
 }
