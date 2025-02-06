@@ -1,7 +1,7 @@
 namespace Nemonuri.Maths.Sequences;
 
 #if NET7_0_OR_GREATER
-public class RationalArithmeticSequencePremise<TNumber> : ISequencePremise<TNumber>
+public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePremise<TNumber>
     where TNumber : IFloatingPoint<TNumber>
 {
     public TNumber First {get;}
@@ -40,7 +40,6 @@ public class RationalArithmeticSequencePremise<TNumber> : ISequencePremise<TNumb
 
     public bool TryGetItem(int index, [NotNullWhen(true)] out TNumber? outItem)
     {
-        
         outItem =
             RationalArithmeticSequenceTheory.GetItem
             (
@@ -48,6 +47,12 @@ public class RationalArithmeticSequencePremise<TNumber> : ISequencePremise<TNumb
                 First,
                 Difference
             );
+
+        if (!CompareTheory.IsBetween(outItem, First, ClosedLast))
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -60,7 +65,54 @@ public class RationalArithmeticSequencePremise<TNumber> : ISequencePremise<TNumb
         }
 
         outSuccessor = value + Difference;
+
+        if (!CompareTheory.IsBetween(outSuccessor, First, ClosedLast))
+        {
+            return false;
+        }
+
         return true;
+    }
+
+    public int GetCount
+    (
+        TNumber leftBoundary,
+        BoundaryClosedDirection leftBoundaryClosedDirection,
+        TNumber rightBoundary,
+        BoundaryClosedDirection rightBoundaryClosedDirection
+    )
+    {
+        int leftClosedBoundaryIndex;
+        {
+            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(leftBoundary, First, Difference);
+            var v2 = TNumber.Ceiling(v1);
+            leftClosedBoundaryIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
+            if 
+            (
+                leftBoundaryClosedDirection == BoundaryClosedDirection.Left &&
+                v1 == v2
+            )
+            {
+                leftClosedBoundaryIndex += 1;
+            }
+        }
+
+        int rightClosedBoundaryIndex;
+        {
+            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(rightBoundary, First, Difference);
+            var v2 = TNumber.Floor(v1);
+            rightClosedBoundaryIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
+            if 
+            (
+                rightBoundaryClosedDirection == BoundaryClosedDirection.Right &&
+                v1 == v2
+            )
+            {
+                rightClosedBoundaryIndex -= 1;
+            }
+        }
+        
+        return rightClosedBoundaryIndex - leftClosedBoundaryIndex + 1;
     }
 }
 #endif

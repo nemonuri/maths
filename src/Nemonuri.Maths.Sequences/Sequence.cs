@@ -2,18 +2,51 @@ namespace Nemonuri.Maths.Sequences;
 
 public class Sequence<T> : IReadOnlyList<T>
 {
+    public IBoundableSequencePremise<T> Premise {get;}
+    public T LeftBoundary {get;}
+    public BoundaryClosedDirection LeftBoundaryClosedDirection {get;}
+    public T RightBoundary {get;}
+    public BoundaryClosedDirection RightBoundaryClosedDirection {get;}
     public T First {get;}
-    public ISequencePremise<T> Premise {get;}
+    
+    public int Count {get;}
 
-    public Sequence(T first, ISequencePremise<T> premise)
+    public Sequence
+    (
+        IBoundableSequencePremise<T> premise,
+
+#region Tolerant Interval
+        T leftBoundary, 
+        BoundaryClosedDirection leftBoundaryClosedDirection, 
+        T rightBoundary, 
+        BoundaryClosedDirection rightBoundaryClosedDirection,
+#endregion Tolerant Interval
+
+        T first
+    )
     {
-        First = first;
+        Guard.IsNotNull(premise);
+
         Premise = premise;
+
+        LeftBoundary = leftBoundary;
+        LeftBoundaryClosedDirection = leftBoundaryClosedDirection;
+        RightBoundary = rightBoundary;
+        RightBoundaryClosedDirection = rightBoundaryClosedDirection;
+
+        First = first;
+
+        Count = premise.GetCount
+            (
+                leftBoundary,
+                leftBoundaryClosedDirection,
+                rightBoundary,
+                rightBoundaryClosedDirection
+            );
     }
 
     public T this[int index] => Premise.GetItem(index);
-
-    public int Count => Premise.Count;
+   
 
     public IEnumerator<T> GetEnumerator() => new Enumerator(this);
 

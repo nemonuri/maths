@@ -34,12 +34,34 @@ public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
     )
     {}
 
-    public RationalArithmeticSequence(RationalArithmeticSequencePremise<TNumber> premise)
+    public RationalArithmeticSequence
+    (
+        RationalArithmeticSequencePremise<TNumber> premise,
+
+#region Tolerant Interval
+        TNumber leftBoundary, 
+        BoundaryClosedDirection leftBoundaryClosedDirection, 
+        TNumber rightBoundary, 
+        BoundaryClosedDirection rightBoundaryClosedDirection,
+#endregion Tolerant Interval
+
+        TNumber first
+    )
     {
         Guard.IsNotNull(premise);
 
         Premise = premise;
-        _innerSequence = new Sequence<TNumber>(premise.First, premise);
+        _innerSequence = new Sequence<TNumber>
+            (
+                premise,
+                
+                leftBoundary,
+                leftBoundaryClosedDirection,
+                rightBoundary,
+                rightBoundaryClosedDirection,
+                
+                first
+            );
     }
 
     public IEnumerator<TNumber> GetEnumerator() => _innerSequence.GetEnumerator();
