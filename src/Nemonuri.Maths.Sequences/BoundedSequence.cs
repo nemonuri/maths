@@ -1,25 +1,34 @@
 namespace Nemonuri.Maths.Sequences;
 
-public class Sequence<T> : IReadOnlyList<T>
+public class BoundedSequence<T> : IReadOnlyList<T>
 {
     public IBoundableSequencePremise<T> Premise {get;}
+    
     public T LeftBoundary {get;}
     public BoundaryClosedDirection LeftBoundaryClosedDirection {get;}
     public T RightBoundary {get;}
     public BoundaryClosedDirection RightBoundaryClosedDirection {get;}
-    public T First {get;}
+
+    public T ZeroIndex {get;}
     
     public int Count {get;}
 
-    public Sequence
+    public BoundedSequence
     (
         IBoundableSequencePremise<T> premise,
 
 #region Tolerant Interval
-        T leftBoundary, 
-        BoundaryClosedDirection leftBoundaryClosedDirection, 
-        T rightBoundary, 
-        BoundaryClosedDirection rightBoundaryClosedDirection,
+        T leftToleranceBoundary,
+        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
+
+        T leftMainBoundary,
+        BoundaryClosedDirection leftMainBoundaryClosedDirection,
+
+        T rightMainBoundary,
+        BoundaryClosedDirection rightMainBoundaryClosedDirection,
+
+        T rightToleranceBoundary,
+        BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
 #endregion Tolerant Interval
 
         T zeroIndex
@@ -34,7 +43,7 @@ public class Sequence<T> : IReadOnlyList<T>
         RightBoundary = rightBoundary;
         RightBoundaryClosedDirection = rightBoundaryClosedDirection;
 
-        First = zeroIndex;
+        ZeroIndex = zeroIndex;
 
         Count = premise.GetCount
             (
@@ -54,14 +63,14 @@ public class Sequence<T> : IReadOnlyList<T>
 
     public class Enumerator : IEnumerator<T>
     {
-        private readonly Sequence<T> _innerSource;
+        private readonly BoundedSequence<T> _innerSource;
 
         private T _current;
 
-        public Enumerator(Sequence<T> innerSource)
+        public Enumerator(BoundedSequence<T> innerSource)
         {
             _innerSource = innerSource;
-            _current = _innerSource.First;
+            _current = _innerSource.ZeroIndex;
         }
 
         public T Current => _current;
@@ -83,7 +92,7 @@ public class Sequence<T> : IReadOnlyList<T>
 
         public void Reset()
         {
-            _current = _innerSource.First;
+            _current = _innerSource.ZeroIndex;
         }
     }
 }

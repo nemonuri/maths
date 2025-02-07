@@ -6,15 +6,13 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
 {
     public TNumber ZeroIndex {get;}
     public TNumber Difference {get;}
-    public TNumber LeftTolerance {get;}
     public Func<TNumber, int> IntegerizedRationalNumberToInt32Mapping {get;}
     public Func<int, TNumber> Int32ToPseudoIndexMapping {get;}
 
     public BoundableRationalArithmeticSequencePremise
     (
         TNumber zeroIndex,  
-        TNumber difference, 
-        TNumber leftTolerance,
+        TNumber difference,
         Func<TNumber, int> integerizedRationalNumberToInt32Mapping,
         Func<int, TNumber> int32ToPseudoIndexMapping
     )
@@ -24,7 +22,6 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
 
         ZeroIndex = zeroIndex;
         Difference = difference;
-        LeftTolerance = leftTolerance;
         IntegerizedRationalNumberToInt32Mapping = integerizedRationalNumberToInt32Mapping;
         Int32ToPseudoIndexMapping = int32ToPseudoIndexMapping;
     }
@@ -51,11 +48,6 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
         }
 
         outSuccessor = value + Difference;
-
-        if (!CompareTheory.IsBetween(outSuccessor, ZeroIndex, ClosedLast))
-        {
-            return false;
-        }
 
         return true;
     }

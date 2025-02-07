@@ -1,7 +1,7 @@
 namespace Nemonuri.Maths.Sequences;
 
 #if NET7_0_OR_GREATER
-public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
+public class BoundedRationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
     where TNumber : IFloatingPoint<TNumber>
 {
     public BoundableRationalArithmeticSequencePremise<TNumber> Premise {get;}
@@ -10,9 +10,9 @@ public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
 
     public TNumber this[int index] => _innerSequence[index];
 
-    private readonly Sequence<TNumber> _innerSequence;
+    private readonly BoundedSequence<TNumber> _innerSequence;
 
-    public RationalArithmeticSequence
+    public BoundedRationalArithmeticSequence
     (
         TNumber first, 
         TNumber closedLast, 
@@ -34,15 +34,22 @@ public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
     )
     {}
 
-    public RationalArithmeticSequence
+    public BoundedRationalArithmeticSequence
     (
         BoundableRationalArithmeticSequencePremise<TNumber> premise,
 
 #region Tolerant Interval
-        TNumber leftBoundary, 
-        BoundaryClosedDirection leftBoundaryClosedDirection, 
-        TNumber rightBoundary, 
-        BoundaryClosedDirection rightBoundaryClosedDirection,
+        TNumber leftToleranceBoundary,
+        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
+
+        TNumber leftMainBoundary,
+        BoundaryClosedDirection leftMainBoundaryClosedDirection,
+
+        TNumber rightMainBoundary,
+        BoundaryClosedDirection rightMainBoundaryClosedDirection,
+
+        TNumber rightToleranceBoundary,
+        BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
 #endregion Tolerant Interval
     )
     {

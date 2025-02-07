@@ -1,7 +1,7 @@
 namespace Nemonuri.Maths.Sequences.RawStructs;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct RawStructInterval<T>
+public struct RawStructInterval<T> : IInterval<T>
 {
     public T LeftBoundary;
     public BoundaryClosedDirection LeftBoundaryClosedDirection;
@@ -22,4 +22,9 @@ public struct RawStructInterval<T>
         RightBoundary = rightBoundary;
         RightBoundaryClosedDirection = rightBoundaryClosedDirection;
     }
+
+    readonly T IInterval<T>.LeftBoundary => LeftBoundary;
+    readonly BoundaryClosedDirection IInterval<T>.LeftBoundaryClosedDirection => LeftBoundaryClosedDirection;
+    readonly T IInterval<T>.RightBoundary => RightBoundary;
+    readonly BoundaryClosedDirection IInterval<T>.RightBoundaryClosedDirection => RightBoundaryClosedDirection;
 }
