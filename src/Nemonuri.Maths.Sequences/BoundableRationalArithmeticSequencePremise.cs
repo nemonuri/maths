@@ -1,7 +1,7 @@
 namespace Nemonuri.Maths.Sequences;
 
 #if NET7_0_OR_GREATER
-public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePremise<TNumber>
+public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSequencePremise<TNumber>
     where TNumber : IFloatingPoint<TNumber>
 {
     public TNumber ZeroIndex {get;}
@@ -10,7 +10,7 @@ public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePrem
     public Func<TNumber, int> IntegerizedRationalNumberToInt32Mapping {get;}
     public Func<int, TNumber> Int32ToPseudoIndexMapping {get;}
 
-    public RationalArithmeticSequencePremise
+    public BoundableRationalArithmeticSequencePremise
     (
         TNumber zeroIndex,  
         TNumber difference, 

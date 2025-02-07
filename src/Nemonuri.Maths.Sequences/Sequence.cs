@@ -22,7 +22,7 @@ public class Sequence<T> : IReadOnlyList<T>
         BoundaryClosedDirection rightBoundaryClosedDirection,
 #endregion Tolerant Interval
 
-        T first
+        T zeroIndex
     )
     {
         Guard.IsNotNull(premise);
@@ -34,7 +34,7 @@ public class Sequence<T> : IReadOnlyList<T>
         RightBoundary = rightBoundary;
         RightBoundaryClosedDirection = rightBoundaryClosedDirection;
 
-        First = first;
+        First = zeroIndex;
 
         Count = premise.GetCount
             (

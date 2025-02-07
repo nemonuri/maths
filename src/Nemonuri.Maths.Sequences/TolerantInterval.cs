@@ -2,7 +2,7 @@ namespace Nemonuri.Maths.Sequences;
 
 using RawStructs;
 
-public class TolerantInterval<T>
+public class TolerantInterval<T> : ITolerantInterval<T>
 {
     private readonly RawStructTolerantInterval<T> _rawStruct;
 

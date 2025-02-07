@@ -4,7 +4,7 @@ namespace Nemonuri.Maths.Sequences;
 public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
     where TNumber : IFloatingPoint<TNumber>
 {
-    public RationalArithmeticSequencePremise<TNumber> Premise {get;}
+    public BoundableRationalArithmeticSequencePremise<TNumber> Premise {get;}
 
     public int Count => _innerSequence.Count;
 
@@ -36,7 +36,7 @@ public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
 
     public RationalArithmeticSequence
     (
-        RationalArithmeticSequencePremise<TNumber> premise,
+        BoundableRationalArithmeticSequencePremise<TNumber> premise,
 
 #region Tolerant Interval
         TNumber leftBoundary, 
