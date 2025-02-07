@@ -44,8 +44,6 @@ public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
         TNumber rightBoundary, 
         BoundaryClosedDirection rightBoundaryClosedDirection,
 #endregion Tolerant Interval
-
-        TNumber first
     )
     {
         Guard.IsNotNull(premise);
@@ -60,7 +58,7 @@ public class RationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
                 rightBoundary,
                 rightBoundaryClosedDirection,
                 
-                first
+                premise.ZeroIndex
             );
     }
 

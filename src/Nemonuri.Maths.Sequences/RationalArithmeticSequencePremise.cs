@@ -4,8 +4,7 @@ namespace Nemonuri.Maths.Sequences;
 public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePremise<TNumber>
     where TNumber : IFloatingPoint<TNumber>
 {
-    public TNumber First {get;}
-    public TNumber ClosedLast {get;}
+    public TNumber ZeroIndex {get;}
     public TNumber Difference {get;}
     public TNumber LeftTolerance {get;}
     public Func<TNumber, int> IntegerizedRationalNumberToInt32Mapping {get;}
@@ -13,8 +12,7 @@ public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePrem
 
     public RationalArithmeticSequencePremise
     (
-        TNumber first, 
-        TNumber closedLast, 
+        TNumber zeroIndex,  
         TNumber difference, 
         TNumber leftTolerance,
         Func<TNumber, int> integerizedRationalNumberToInt32Mapping,
@@ -24,19 +22,12 @@ public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePrem
         Guard.IsNotNull(integerizedRationalNumberToInt32Mapping);
         Guard.IsNotNull(int32ToPseudoIndexMapping);
 
-        First = first;
-        ClosedLast = closedLast;
+        ZeroIndex = zeroIndex;
         Difference = difference;
         LeftTolerance = leftTolerance;
         IntegerizedRationalNumberToInt32Mapping = integerizedRationalNumberToInt32Mapping;
         Int32ToPseudoIndexMapping = int32ToPseudoIndexMapping;
-
-        var v1 = (closedLast - first)/difference;
-        var v2 = TNumber.Floor(v1);
-        Count = integerizedRationalNumberToInt32Mapping.Invoke(v2);
     }
-
-    public int Count { get; }
 
     public bool TryGetItem(int index, [NotNullWhen(true)] out TNumber? outItem)
     {
@@ -44,14 +35,9 @@ public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePrem
             RationalArithmeticSequenceTheory.GetItem
             (
                 Int32ToPseudoIndexMapping.Invoke(index),
-                First,
+                ZeroIndex,
                 Difference
             );
-
-        if (!CompareTheory.IsBetween(outItem, First, ClosedLast))
-        {
-            return false;
-        }
 
         return true;
     }
@@ -66,7 +52,7 @@ public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePrem
 
         outSuccessor = value + Difference;
 
-        if (!CompareTheory.IsBetween(outSuccessor, First, ClosedLast))
+        if (!CompareTheory.IsBetween(outSuccessor, ZeroIndex, ClosedLast))
         {
             return false;
         }
@@ -84,7 +70,7 @@ public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePrem
     {
         int leftClosedBoundaryIndex;
         {
-            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(leftBoundary, First, Difference);
+            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(leftBoundary, ZeroIndex, Difference);
             var v2 = TNumber.Ceiling(v1);
             leftClosedBoundaryIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
             if 
@@ -99,7 +85,7 @@ public class RationalArithmeticSequencePremise<TNumber> : IBoundableSequencePrem
 
         int rightClosedBoundaryIndex;
         {
-            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(rightBoundary, First, Difference);
+            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(rightBoundary, ZeroIndex, Difference);
             var v2 = TNumber.Floor(v1);
             rightClosedBoundaryIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
             if 
