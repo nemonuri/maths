@@ -1,6 +1,6 @@
 namespace Nemonuri.Maths.Sequences;
 
-public static class TolerantIntervalTheory
+public static partial class TolerantIntervalTheory
 {
     public static TolerantIntervalSectionKind GetSectionKind<TNumber>
     (
@@ -335,7 +335,7 @@ public static class TolerantIntervalTheory
         //---|
     }
 
-    private static bool TryGetToleranceAlternativeIndex
+    public static bool TryGetToleranceAlternativeIndex
     <
         TRaw, 
         TPseudoIndex, 
