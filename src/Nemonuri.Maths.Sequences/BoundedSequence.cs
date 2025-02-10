@@ -4,10 +4,7 @@ public class BoundedSequence<T> : IReadOnlyList<T>
 {
     public IBoundableSequencePremise<T> Premise {get;}
     
-    public T LeftBoundary {get;}
-    public BoundaryClosedDirection LeftBoundaryClosedDirection {get;}
-    public T RightBoundary {get;}
-    public BoundaryClosedDirection RightBoundaryClosedDirection {get;}
+    public ITolerantInterval<T> TolerantInterval {get;}
 
     public T ZeroIndex {get;}
     
@@ -16,42 +13,35 @@ public class BoundedSequence<T> : IReadOnlyList<T>
     public BoundedSequence
     (
         IBoundableSequencePremise<T> premise,
-
-#region Tolerant Interval
-        T leftToleranceBoundary,
-        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
-
-        T leftMainBoundary,
-        BoundaryClosedDirection leftMainBoundaryClosedDirection,
-
-        T rightMainBoundary,
-        BoundaryClosedDirection rightMainBoundaryClosedDirection,
-
-        T rightToleranceBoundary,
-        BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
-#endregion Tolerant Interval
-
+        ITolerantInterval<T> tolerantInterval,
+        IExtraArgumentAttachedMapping<T, object?, int> rawToIndexMapping,
+        IAlternativeIndexFactory<T, object?, int> leftToleranceAlternativeIndexFactory,
+        IAlternativeIndexFactory<T, object?, int> rightToleranceAlternativeIndexFactory,
         T zeroIndex
     )
     {
         Guard.IsNotNull(premise);
+        Guard.IsNotNull(tolerantInterval);
+        Guard.IsNotNull(rawToIndexMapping);
+        Guard.IsNotNull(leftToleranceAlternativeIndexFactory);
+        Guard.IsNotNull(rightToleranceAlternativeIndexFactory);
 
         Premise = premise;
-
-        LeftBoundary = leftBoundary;
-        LeftBoundaryClosedDirection = leftBoundaryClosedDirection;
-        RightBoundary = rightBoundary;
-        RightBoundaryClosedDirection = rightBoundaryClosedDirection;
-
+        TolerantInterval = tolerantInterval;
         ZeroIndex = zeroIndex;
 
-        Count = premise.GetCount
+        //--- Count 구하기 ---
+        int count = 
+            premise.GetCount
             (
-                leftBoundary,
-                leftBoundaryClosedDirection,
-                rightBoundary,
-                rightBoundaryClosedDirection
+                tolerantInterval.LeftMain.Anchor,
+                tolerantInterval.LeftMain.ClosedDirection,
+                tolerantInterval.RightMain.Anchor,
+                tolerantInterval.RightMain.ClosedDirection
             );
+        
+        //if (leftToleranceAlternativeIndexFactory.)
+        //---|
     }
 
     public T this[int index] => Premise.GetItem(index);

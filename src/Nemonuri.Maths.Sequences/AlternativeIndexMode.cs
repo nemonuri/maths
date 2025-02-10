@@ -1,6 +1,6 @@
 namespace Nemonuri.Maths.Sequences;
 
-public enum ToleranceAlternativeIndexMode
+public enum AlternativeIndexMode
 {
     Default = 0,
     AlternativeIndex = 1,

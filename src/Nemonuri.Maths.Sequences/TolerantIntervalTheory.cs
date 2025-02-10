@@ -246,12 +246,12 @@ public static partial class TolerantIntervalTheory
         TArg1? rawToNormalizedIndexMappingArg,
 
 #region Tolerance Alternative Index
-        ToleranceAlternativeIndexMode leftToleranceAlternativeIndexMode,
+        AlternativeIndexMode leftToleranceAlternativeIndexMode,
         TPseudoIndex? leftToleranceAlternativeIndex,
         Func<TRaw, TArg2?, TPseudoIndex>? leftToleranceAlternativeMapping,
         TArg2? leftToleranceAlternativeMappingArg,
         
-        ToleranceAlternativeIndexMode rightToleranceAlternativeIndexMode,
+        AlternativeIndexMode rightToleranceAlternativeIndexMode,
         TPseudoIndex? rightToleranceAlternativeIndex,
         Func<TRaw, TArg3?, TPseudoIndex>? rightToleranceAlternativeMapping,
         TArg3? rightToleranceAlternativeMappingArg,
@@ -363,10 +363,10 @@ public static partial class TolerantIntervalTheory
         TArg2
     >
     (
-        TRaw leftMainBoundary,
+        TRaw rawValue,
         Func<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
         TArg1? rawToNormalizedIndexMappingArg,
-        ToleranceAlternativeIndexMode toleranceAlternativeIndexMode,
+        AlternativeIndexMode toleranceAlternativeIndexMode,
         TPseudoIndex? toleranceAlternativeIndex,
         Func<TRaw, TArg2?, TPseudoIndex>? toleranceAlternativeMapping,
         TArg2? toleranceAlternativeMappingArg,
@@ -375,21 +375,21 @@ public static partial class TolerantIntervalTheory
         where TRaw : IComparable<TRaw>
         where TPseudoIndex : IComparable<TPseudoIndex>
     {
-        if (toleranceAlternativeIndexMode == ToleranceAlternativeIndexMode.Default)
+        if (toleranceAlternativeIndexMode == AlternativeIndexMode.Default)
         {
-            outIndex = rawToNormalizedIndexMapping.Invoke(leftMainBoundary, rawToNormalizedIndexMappingArg);
+            outIndex = rawToNormalizedIndexMapping.Invoke(rawValue, rawToNormalizedIndexMappingArg);
             return true;
         }
-        else if (toleranceAlternativeIndexMode == ToleranceAlternativeIndexMode.AlternativeIndex)
+        else if (toleranceAlternativeIndexMode == AlternativeIndexMode.AlternativeIndex)
         {
             Guard.IsNotNull(toleranceAlternativeIndex);
             outIndex = toleranceAlternativeIndex;
             return true;
         }
-        else if (toleranceAlternativeIndexMode == ToleranceAlternativeIndexMode.AlternativeMapping)
+        else if (toleranceAlternativeIndexMode == AlternativeIndexMode.AlternativeMapping)
         {
             Guard.IsNotNull(toleranceAlternativeMapping);
-            outIndex = toleranceAlternativeMapping.Invoke(leftMainBoundary, toleranceAlternativeMappingArg);
+            outIndex = toleranceAlternativeMapping.Invoke(rawValue, toleranceAlternativeMappingArg);
             return true;
         }
         else
@@ -417,8 +417,8 @@ public static partial class TolerantIntervalTheory
         IExtraArgumentAttachedMapping<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
 
 #region Tolerance Alternative Index
-        IToleranceAlternativeIndexFactory<TRaw, TArg2?, TPseudoIndex> leftToleranceAlternativeIndexFactory,
-        IToleranceAlternativeIndexFactory<TRaw, TArg3?, TPseudoIndex> rightToleranceAlternativeIndexFactory,
+        IAlternativeIndexFactory<TRaw, TArg2?, TPseudoIndex> leftToleranceAlternativeIndexFactory,
+        IAlternativeIndexFactory<TRaw, TArg3?, TPseudoIndex> rightToleranceAlternativeIndexFactory,
 #endregion Tolerance Alternative Index
 
         [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
@@ -452,6 +452,64 @@ public static partial class TolerantIntervalTheory
                 rightToleranceAlternativeIndex: rightToleranceAlternativeIndexFactory.AlternativeIndex,
                 rightToleranceAlternativeMapping: rightToleranceAlternativeIndexFactory.AlternativeMapping?.Mapping,
                 rightToleranceAlternativeMappingArg: rightToleranceAlternativeIndexFactory.AlternativeMapping is {} v2 ? v2.ExtraArgument : default,
+
+                out outNormalizedIndex
+            );
+    }
+
+    public static bool TryGetNormalizedIndex
+    <
+        TRaw,
+        TPseudoIndex,
+        TArg1,
+        TArg2,
+        TArg3
+    >
+    (
+        TRaw rawValue,
+
+#region Interval
+        TRaw leftBoundary,
+        BoundaryClosedDirection leftBoundaryClosedDirection,
+
+        TRaw rightBoundary,
+        BoundaryClosedDirection rightBoundaryClosedDirection,
+#endregion Interval
+
+        Func<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
+        TArg1? rawToNormalizedIndexMappingArg,
+
+        [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
+    )
+        where TRaw : IComparable<TRaw>
+        where TPseudoIndex : IComparable<TPseudoIndex>
+    {
+        return
+            TryGetNormalizedIndex
+            (
+                rawValue: rawValue,
+
+                leftToleranceBoundary: leftBoundary,
+                leftToleranceBoundaryClosedDirection: leftBoundaryClosedDirection,
+                leftMainBoundary: leftBoundary,
+                leftMainBoundaryClosedDirection: leftBoundaryClosedDirection,
+                rightMainBoundary: rightBoundary,
+                rightMainBoundaryClosedDirection: rightBoundaryClosedDirection,
+                rightToleranceBoundary: rightBoundary,
+                rightToleranceBoundaryClosedDirection: rightBoundaryClosedDirection,
+
+                rawToNormalizedIndexMapping: rawToNormalizedIndexMapping,
+                rawToNormalizedIndexMappingArg: rawToNormalizedIndexMappingArg,
+
+                leftToleranceAlternativeIndexMode: AlternativeIndexMode.Default,
+                leftToleranceAlternativeIndex: default,
+                leftToleranceAlternativeMapping: null,
+                leftToleranceAlternativeMappingArg: default(TArg2),
+
+                rightToleranceAlternativeIndexMode: AlternativeIndexMode.Default,
+                rightToleranceAlternativeIndex: default,
+                rightToleranceAlternativeMapping: null,
+                rightToleranceAlternativeMappingArg: default(TArg3),
 
                 out outNormalizedIndex
             );
