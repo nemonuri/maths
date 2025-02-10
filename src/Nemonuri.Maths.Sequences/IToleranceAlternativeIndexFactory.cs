@@ -7,7 +7,7 @@ public interface IToleranceAlternativeIndexFactory<TRaw, TExtraArgument, TPseudo
     where TPseudoIndex : allows ref struct
 #endif
 {
-    ToleranceAlternativeIndexMode ToleranceAlternativeIndexMode {get;}
+    ToleranceAlternativeIndexMode Mode {get;}
     TPseudoIndex? AlternativeIndex {get;}
     IExtraArgumentAttachedMapping<TRaw, TExtraArgument, TPseudoIndex>? AlternativeMapping {get;}
 }

@@ -9,12 +9,12 @@ public class ToleranceAlternativeIndexFactory<TRaw, TExtraArgument, TPseudoIndex
 {
     public ToleranceAlternativeIndexFactory(ToleranceAlternativeIndexMode toleranceAlternativeIndexMode, TPseudoIndex? alternativeIndex, IExtraArgumentAttachedMapping<TRaw, TExtraArgument, TPseudoIndex>? alternativeMapping)
     {
-        ToleranceAlternativeIndexMode = toleranceAlternativeIndexMode;
+        Mode = toleranceAlternativeIndexMode;
         AlternativeIndex = alternativeIndex;
         AlternativeMapping = alternativeMapping;
     }
 
-    public ToleranceAlternativeIndexMode ToleranceAlternativeIndexMode {get;}
+    public ToleranceAlternativeIndexMode Mode {get;}
     public TPseudoIndex? AlternativeIndex {get;}
     public IExtraArgumentAttachedMapping<TRaw, TExtraArgument, TPseudoIndex>? AlternativeMapping {get;}
 }

@@ -197,6 +197,26 @@ public static partial class TolerantIntervalTheory
         }
     }
 
+    public static IntervalSectionKind ToIntervalSectionKind(this TolerantIntervalSectionKind source) =>
+        source switch
+        {
+            TolerantIntervalSectionKind.LeftOutside => IntervalSectionKind.LeftOutside,
+            TolerantIntervalSectionKind.Main => IntervalSectionKind.Main,
+            TolerantIntervalSectionKind.RightOutside => IntervalSectionKind.RightOutside,
+
+            TolerantIntervalSectionKind.BoundaryOfLeftOutsideAndLeftTolerance or 
+            TolerantIntervalSectionKind.LeftTolerance or
+            TolerantIntervalSectionKind.BoundaryOfLeftToleranceAndMain =>
+            IntervalSectionKind.BoundaryOfLeftOutsideAndMain,
+
+            TolerantIntervalSectionKind.BoundaryOfRightToleranceAndRightOutside or 
+            TolerantIntervalSectionKind.RightTolerance or
+            TolerantIntervalSectionKind.BoundaryOfMainAndRightTolerance =>
+            IntervalSectionKind.BoundaryOfRightOutsideAndMain,
+
+            _ => IntervalSectionKind.Unknown
+        };
+
     public static bool TryGetNormalizedIndex
     <
         TRaw,
@@ -377,5 +397,63 @@ public static partial class TolerantIntervalTheory
             outIndex = default;
             return false;
         }
+    }
+
+    public static bool TryGetNormalizedIndex
+    <
+        TRaw,
+        TPseudoIndex,
+        TArg1,
+        TArg2,
+        TArg3
+    >
+    (
+        TRaw rawValue,
+
+#region Tolerant Interval
+        ITolerantInterval<TRaw> tolerantInterval,
+#endregion Tolerant Interval
+
+        IExtraArgumentAttachedMapping<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
+
+#region Tolerance Alternative Index
+        IToleranceAlternativeIndexFactory<TRaw, TArg2?, TPseudoIndex> leftToleranceAlternativeIndexFactory,
+        IToleranceAlternativeIndexFactory<TRaw, TArg3?, TPseudoIndex> rightToleranceAlternativeIndexFactory,
+#endregion Tolerance Alternative Index
+
+        [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
+    )
+        where TRaw : IComparable<TRaw>
+        where TPseudoIndex : IComparable<TPseudoIndex>
+    {
+        return
+            TryGetNormalizedIndex
+            (
+                rawValue: rawValue,
+
+                leftToleranceBoundary: tolerantInterval.LeftTolerance.Anchor,
+                leftToleranceBoundaryClosedDirection: tolerantInterval.LeftTolerance.ClosedDirection,
+                leftMainBoundary: tolerantInterval.LeftMain.Anchor,
+                leftMainBoundaryClosedDirection: tolerantInterval.LeftMain.ClosedDirection,
+                rightMainBoundary: tolerantInterval.RightMain.Anchor,
+                rightMainBoundaryClosedDirection: tolerantInterval.RightMain.ClosedDirection,
+                rightToleranceBoundary: tolerantInterval.RightTolerance.Anchor,
+                rightToleranceBoundaryClosedDirection: tolerantInterval.RightTolerance.ClosedDirection,
+
+                rawToNormalizedIndexMapping: rawToNormalizedIndexMapping.Mapping,
+                rawToNormalizedIndexMappingArg: rawToNormalizedIndexMapping.ExtraArgument,
+
+                leftToleranceAlternativeIndexMode: leftToleranceAlternativeIndexFactory.Mode,
+                leftToleranceAlternativeIndex: leftToleranceAlternativeIndexFactory.AlternativeIndex,
+                leftToleranceAlternativeMapping: leftToleranceAlternativeIndexFactory.AlternativeMapping?.Mapping,
+                leftToleranceAlternativeMappingArg: leftToleranceAlternativeIndexFactory.AlternativeMapping is {} v1 ? v1.ExtraArgument : default,
+                
+                rightToleranceAlternativeIndexMode: rightToleranceAlternativeIndexFactory.Mode,
+                rightToleranceAlternativeIndex: rightToleranceAlternativeIndexFactory.AlternativeIndex,
+                rightToleranceAlternativeMapping: rightToleranceAlternativeIndexFactory.AlternativeMapping?.Mapping,
+                rightToleranceAlternativeMappingArg: rightToleranceAlternativeIndexFactory.AlternativeMapping is {} v2 ? v2.ExtraArgument : default,
+
+                out outNormalizedIndex
+            );
     }
 }

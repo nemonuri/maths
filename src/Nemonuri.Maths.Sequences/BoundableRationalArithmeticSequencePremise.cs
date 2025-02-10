@@ -1,7 +1,7 @@
 namespace Nemonuri.Maths.Sequences;
 
 #if NET7_0_OR_GREATER
-public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSequencePremise<TNumber>
+public class BoundableRationalArithmeticSequencePremise<TNumber> : ITolerantBoundableSequencePremise<TNumber>
     where TNumber : IFloatingPoint<TNumber>
 {
     public TNumber ZeroIndex {get;}
@@ -92,5 +92,22 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
         
         return rightClosedBoundaryIndex - leftClosedBoundaryIndex + 1;
     }
+
+    public int GetCount
+    (
+        TNumber leftToleranceBoundary,
+        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
+        TNumber leftMainBoundary,
+        BoundaryClosedDirection leftMainBoundaryClosedDirection,
+        TNumber rightMainBoundary,
+        BoundaryClosedDirection rightMainBoundaryClosedDirection,
+        TNumber rightToleranceBoundary,
+        BoundaryClosedDirection rightToleranceBoundaryClosedDirection
+    )
+    {
+        throw new NotImplementedException();
+    }
+
+
 }
 #endif
