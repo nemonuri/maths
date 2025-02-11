@@ -40,7 +40,25 @@ public class BoundedSequence<T> : IReadOnlyList<T>
                 tolerantInterval.RightMain.ClosedDirection
             );
         
-        //if (leftToleranceAlternativeIndexFactory.)
+        {
+            var alternativeIndexFactory = leftToleranceAlternativeIndexFactory;
+            if (alternativeIndexFactory.Mode == AlternativeIndexMode.Default)
+            {
+                int v1 =
+                    premise.GetCount
+                    (
+                        tolerantInterval.LeftTolerance.Anchor,
+                        tolerantInterval.LeftTolerance.ClosedDirection,
+                        tolerantInterval.LeftMain.Anchor,
+                        tolerantInterval.RightMain.ClosedDirection
+                    );
+                int v2 = v1 > 0 ? 1 : 0;
+                count += v2;
+            }
+            
+            if ()
+        }
+        
         //---|
     }
 
