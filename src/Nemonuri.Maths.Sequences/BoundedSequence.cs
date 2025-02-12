@@ -1,14 +1,25 @@
 namespace Nemonuri.Maths.Sequences;
 
 public class BoundedSequence<T> : IReadOnlyList<T>
+        where T : IComparable<T>
 {
     public IBoundableSequencePremise<T> Premise {get;}
     
     public ITolerantInterval<T> TolerantInterval {get;}
 
     public T ZeroIndex {get;}
-    
+
+    public int LeastIndex {get;}
+    public int GreatestIndex {get;}
     public int Count {get;}
+
+    public bool IsLeftTolerantIndexDefault {get;}
+    public int AlternativeLeftTolerantIndex {get;}
+    public int LeftTolerantIndex => IsLeftTolerantIndexDefault ? LeastIndex : AlternativeLeftTolerantIndex;
+
+    public bool IsRightTolerantIndexDefault {get;}
+    public int AlternativeRightTolerantIndex {get;}
+    public int RightTolerantIndex => IsRightTolerantIndexDefault ? GreatestIndex : AlternativeRightTolerantIndex;
 
     public BoundedSequence
     (
@@ -31,35 +42,57 @@ public class BoundedSequence<T> : IReadOnlyList<T>
         ZeroIndex = zeroIndex;
 
         //--- Count 구하기 ---
-        int count = 
+        Count = 
             premise.GetCount
             (
                 tolerantInterval.LeftMain.Anchor,
                 tolerantInterval.LeftMain.ClosedDirection,
                 tolerantInterval.RightMain.Anchor,
-                tolerantInterval.RightMain.ClosedDirection
+                tolerantInterval.RightMain.ClosedDirection,
+                out int outLeastIndex,
+                out int outGreatestIndex
             );
         
+        LeastIndex = outLeastIndex;
+        GreatestIndex = outGreatestIndex;
+
+        if 
+        (
+            leftToleranceAlternativeIndexFactory.TryGetAlternativeIndex<T, int, object, object>
+            (
+                tolerantInterval.LeftMain.Anchor,
+                null,
+                out int v1
+            )
+        )
         {
-            var alternativeIndexFactory = leftToleranceAlternativeIndexFactory;
-            if (alternativeIndexFactory.Mode == AlternativeIndexMode.Default)
-            {
-                int v1 =
-                    premise.GetCount
-                    (
-                        tolerantInterval.LeftTolerance.Anchor,
-                        tolerantInterval.LeftTolerance.ClosedDirection,
-                        tolerantInterval.LeftMain.Anchor,
-                        tolerantInterval.RightMain.ClosedDirection
-                    );
-                int v2 = v1 > 0 ? 1 : 0;
-                count += v2;
-            }
-            
-            if ()
+            IsLeftTolerantIndexDefault = false;
+            AlternativeLeftTolerantIndex = v1;
         }
-        
-        //---|
+        else
+        {
+            IsLeftTolerantIndexDefault = true;
+            AlternativeLeftTolerantIndex = default;
+        }
+
+        if 
+        (
+            rightToleranceAlternativeIndexFactory.TryGetAlternativeIndex<T, int, object, object>
+            (
+                tolerantInterval.RightMain.Anchor,
+                null,
+                out int v2
+            )
+        )
+        {
+            IsRightTolerantIndexDefault = false;
+            AlternativeRightTolerantIndex = v2;
+        }
+        else
+        {
+            IsRightTolerantIndexDefault = true;
+            AlternativeRightTolerantIndex = default;
+        }
     }
 
     public T this[int index] => Premise.GetItem(index);
@@ -73,11 +106,13 @@ public class BoundedSequence<T> : IReadOnlyList<T>
     {
         private readonly BoundedSequence<T> _innerSource;
 
+        private bool _inited;
         private T _current;
 
         public Enumerator(BoundedSequence<T> innerSource)
         {
             _innerSource = innerSource;
+            _inited = false;
             _current = _innerSource.ZeroIndex;
         }
 
@@ -90,6 +125,11 @@ public class BoundedSequence<T> : IReadOnlyList<T>
 
         public bool MoveNext()
         {
+            if (!_inited) 
+            {
+                _inited = true;
+            }
+
             if (_innerSource.Premise.TryGetSuccessor(_current, out T? outSuccessor))
             {
                 _current = outSuccessor;
@@ -100,6 +140,7 @@ public class BoundedSequence<T> : IReadOnlyList<T>
 
         public void Reset()
         {
+            _inited = true;
             _current = _innerSource.ZeroIndex;
         }
     }

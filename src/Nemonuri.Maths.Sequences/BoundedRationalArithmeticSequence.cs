@@ -6,7 +6,7 @@ public class BoundedRationalArithmeticSequence<TNumber> : IReadOnlyList<TNumber>
 {
     public BoundableRationalArithmeticSequencePremise<TNumber> Premise {get;}
 
-    public int Count => _innerSequence.Count;
+    public int CountInMain => _innerSequence.Count;
 
     public TNumber this[int index] => _innerSequence[index];
 

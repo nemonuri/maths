@@ -24,7 +24,11 @@ public static class AlternativeIndexTheory
     {
         if (alternativeIndexMode == AlternativeIndexMode.Default)
         {
-            Guard.IsNotNull(defaultIndexMapping);
+            if (defaultIndexMapping is null) 
+            {
+                outIndex = default;
+                return false;
+            }
             outIndex = defaultIndexMapping.Invoke(rawValue, defaultIndexMappingArg);
             return true;
         }

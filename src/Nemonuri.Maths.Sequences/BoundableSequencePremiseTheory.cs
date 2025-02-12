@@ -20,6 +20,12 @@ public static class BoundableSequencePremiseTheory
 
         outLeastIndex = premise.GetLeastIndex(leftBoundary, leftBoundaryClosedDirection);
         outGreatestIndex = premise.GetLeastIndex(rightBoundary, rightBoundaryClosedDirection);
-        return outGreatestIndex - outLeastIndex + 1;
+        return GetCount(outLeastIndex, outGreatestIndex);
+    }
+
+    public static int GetCount(int leastIndex, int greatestIndex)
+    {
+        Guard.IsGreaterThanOrEqualTo(greatestIndex, leastIndex);
+        return greatestIndex - leastIndex + 1;
     }
 }

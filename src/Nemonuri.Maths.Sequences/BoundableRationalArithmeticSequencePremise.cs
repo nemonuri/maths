@@ -52,47 +52,6 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
         return true;
     }
 
-    public int GetCount
-    (
-        TNumber leftBoundary,
-        BoundaryClosedDirection leftBoundaryClosedDirection,
-        TNumber rightBoundary,
-        BoundaryClosedDirection rightBoundaryClosedDirection
-    )
-    {
-        int leftClosedBoundaryIndex;
-        {
-            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(leftBoundary, ZeroIndex, Difference);
-            var v2 = TNumber.Ceiling(v1);
-            leftClosedBoundaryIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
-            if 
-            (
-                leftBoundaryClosedDirection == BoundaryClosedDirection.Left &&
-                v1 == v2
-            )
-            {
-                leftClosedBoundaryIndex += 1;
-            }
-        }
-
-        int rightClosedBoundaryIndex;
-        {
-            var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(rightBoundary, ZeroIndex, Difference);
-            var v2 = TNumber.Floor(v1);
-            rightClosedBoundaryIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
-            if 
-            (
-                rightBoundaryClosedDirection == BoundaryClosedDirection.Right &&
-                v1 == v2
-            )
-            {
-                rightClosedBoundaryIndex -= 1;
-            }
-        }
-        
-        return rightClosedBoundaryIndex - leftClosedBoundaryIndex + 1;
-    }
-
     public int GetLeastIndex(TNumber leftBoundary, BoundaryClosedDirection leftBoundaryClosedDirection)
     {
         int result;
