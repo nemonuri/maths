@@ -292,7 +292,7 @@ public static partial class TolerantIntervalTheory
         {
             //--- 왼쪽 값 구하기 ---
             return
-                TryGetToleranceAlternativeIndex
+                AlternativeIndexTheory.TryGetAlternativeIndex
                 (
                     leftMainBoundary,
                     rawToNormalizedIndexMapping,
@@ -309,7 +309,7 @@ public static partial class TolerantIntervalTheory
         {
             //--- 오른쪽 값 구하기 ---
             return
-                TryGetToleranceAlternativeIndex
+                AlternativeIndexTheory.TryGetAlternativeIndex
                 (
                     rightMainBoundary,
                     rawToNormalizedIndexMapping,
@@ -353,50 +353,6 @@ public static partial class TolerantIntervalTheory
             return ThrowHelper.ThrowInvalidOperationException<bool>(/* TODO */);
         }
         //---|
-    }
-
-    public static bool TryGetToleranceAlternativeIndex
-    <
-        TRaw, 
-        TPseudoIndex, 
-        TArg1, 
-        TArg2
-    >
-    (
-        TRaw rawValue,
-        Func<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
-        TArg1? rawToNormalizedIndexMappingArg,
-        AlternativeIndexMode toleranceAlternativeIndexMode,
-        TPseudoIndex? toleranceAlternativeIndex,
-        Func<TRaw, TArg2?, TPseudoIndex>? toleranceAlternativeMapping,
-        TArg2? toleranceAlternativeMappingArg,
-        [NotNullWhen(true)] out TPseudoIndex? outIndex
-    )
-        where TRaw : IComparable<TRaw>
-        where TPseudoIndex : IComparable<TPseudoIndex>
-    {
-        if (toleranceAlternativeIndexMode == AlternativeIndexMode.Default)
-        {
-            outIndex = rawToNormalizedIndexMapping.Invoke(rawValue, rawToNormalizedIndexMappingArg);
-            return true;
-        }
-        else if (toleranceAlternativeIndexMode == AlternativeIndexMode.AlternativeIndex)
-        {
-            Guard.IsNotNull(toleranceAlternativeIndex);
-            outIndex = toleranceAlternativeIndex;
-            return true;
-        }
-        else if (toleranceAlternativeIndexMode == AlternativeIndexMode.AlternativeMapping)
-        {
-            Guard.IsNotNull(toleranceAlternativeMapping);
-            outIndex = toleranceAlternativeMapping.Invoke(rawValue, toleranceAlternativeMappingArg);
-            return true;
-        }
-        else
-        {
-            outIndex = default;
-            return false;
-        }
     }
 
     public static bool TryGetNormalizedIndex
