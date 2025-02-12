@@ -13,10 +13,14 @@ public interface IBoundableSequencePremise<T> : ISequencePremise<T>
     where T : allows ref struct
 #endif
 {
-    int GetCount
+    int GetLeastIndex
     (
         T leftBoundary, 
-        BoundaryClosedDirection leftBoundaryClosedDirection, 
+        BoundaryClosedDirection leftBoundaryClosedDirection
+    );
+
+    int GetGreatestIndex
+    (
         T rightBoundary, 
         BoundaryClosedDirection rightBoundaryClosedDirection
     );

@@ -1,7 +1,7 @@
 namespace Nemonuri.Maths.Sequences;
 
 #if NET7_0_OR_GREATER
-public class BoundableRationalArithmeticSequencePremise<TNumber> : ITolerantBoundableSequencePremise<TNumber>
+public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSequencePremise<TNumber>
     where TNumber : IFloatingPoint<TNumber>
 {
     public TNumber ZeroIndex {get;}
@@ -93,21 +93,42 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : ITolerantBoun
         return rightClosedBoundaryIndex - leftClosedBoundaryIndex + 1;
     }
 
-    public int GetCount
-    (
-        TNumber leftToleranceBoundary,
-        BoundaryClosedDirection leftToleranceBoundaryClosedDirection,
-        TNumber leftMainBoundary,
-        BoundaryClosedDirection leftMainBoundaryClosedDirection,
-        TNumber rightMainBoundary,
-        BoundaryClosedDirection rightMainBoundaryClosedDirection,
-        TNumber rightToleranceBoundary,
-        BoundaryClosedDirection rightToleranceBoundaryClosedDirection
-    )
+    public int GetLeastIndex(TNumber leftBoundary, BoundaryClosedDirection leftBoundaryClosedDirection)
     {
-        throw new NotImplementedException();
+        int result;
+
+        var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(leftBoundary, ZeroIndex, Difference);
+        var v2 = TNumber.Ceiling(v1);
+        result = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
+        if 
+        (
+            leftBoundaryClosedDirection == BoundaryClosedDirection.Left &&
+            v1 == v2
+        )
+        {
+            result += 1;
+        }
+        
+        return result;
     }
 
-
+    public int GetGreatestIndex(TNumber rightBoundary, BoundaryClosedDirection rightBoundaryClosedDirection)
+    {
+        int result;
+        
+        var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(rightBoundary, ZeroIndex, Difference);
+        var v2 = TNumber.Floor(v1);
+        result = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
+        if 
+        (
+            rightBoundaryClosedDirection == BoundaryClosedDirection.Right &&
+            v1 == v2
+        )
+        {
+            result -= 1;
+        }
+        
+        return result;
+    }
 }
 #endif
