@@ -1,13 +1,13 @@
 namespace Nemonuri.Maths.Sequences;
 
 public class BoundedSequence<T> : IReadOnlyList<T>
-        where T : IComparable<T>
+    where T : IComparable<T>
 {
-    public IBoundableSequencePremise<T> Premise {get;}
+    public ISequencePremise<T> SequencePremise {get;}
+    public ISequenceBoundingPremise<T> SequenceBoundingPremise {get;}
+    public ISequenceItemToIndexPremise<T> SequenceItemToIndexPremise {get;}
     
     public ITolerantInterval<T> TolerantInterval {get;}
-
-    public T ZeroIndex {get;}
 
     public int LeastIndex {get;}
     public int GreatestIndex {get;}
@@ -23,27 +23,27 @@ public class BoundedSequence<T> : IReadOnlyList<T>
 
     public BoundedSequence
     (
-        IBoundableSequencePremise<T> premise,
+        ISequencePremise<T> sequencePremise,
+        ISequenceBoundingPremise<T> sequenceBoundingPremise,
+        ISequenceItemToIndexPremise<T> sequenceItemToIndexPremise,
         ITolerantInterval<T> tolerantInterval,
-        IExtraArgumentAttachedMapping<T, object?, int> rawToIndexMapping,
-        IAlternativeIndexFactory<T, object?, int> leftToleranceAlternativeIndexFactory,
-        IAlternativeIndexFactory<T, object?, int> rightToleranceAlternativeIndexFactory,
-        T zeroIndex
+        IAlternativeIndexFactory<T, object?, int>? leftToleranceAlternativeIndexFactory,
+        IAlternativeIndexFactory<T, object?, int>? rightToleranceAlternativeIndexFactory
     )
     {
-        Guard.IsNotNull(premise);
+        Guard.IsNotNull(sequencePremise);
+        Guard.IsNotNull(sequenceBoundingPremise);
+        Guard.IsNotNull(sequenceItemToIndexPremise);
         Guard.IsNotNull(tolerantInterval);
-        Guard.IsNotNull(rawToIndexMapping);
-        Guard.IsNotNull(leftToleranceAlternativeIndexFactory);
-        Guard.IsNotNull(rightToleranceAlternativeIndexFactory);
 
-        Premise = premise;
+        SequencePremise = sequencePremise;
+        SequenceBoundingPremise = sequenceBoundingPremise;
+        SequenceItemToIndexPremise = sequenceItemToIndexPremise;
         TolerantInterval = tolerantInterval;
-        ZeroIndex = zeroIndex;
 
         //--- Count 구하기 ---
         Count = 
-            premise.GetCount
+            sequenceBoundingPremise.GetCount
             (
                 tolerantInterval.LeftMain.Anchor,
                 tolerantInterval.LeftMain.ClosedDirection,
@@ -58,12 +58,13 @@ public class BoundedSequence<T> : IReadOnlyList<T>
 
         if 
         (
-            leftToleranceAlternativeIndexFactory.TryGetAlternativeIndex<T, int, object, object>
+            leftToleranceAlternativeIndexFactory?.TryGetAlternativeIndex<T, int, object, object>
             (
                 tolerantInterval.LeftMain.Anchor,
                 null,
                 out int v1
-            )
+            ) ?? 
+            false
         )
         {
             IsLeftTolerantIndexDefault = false;
@@ -77,12 +78,13 @@ public class BoundedSequence<T> : IReadOnlyList<T>
 
         if 
         (
-            rightToleranceAlternativeIndexFactory.TryGetAlternativeIndex<T, int, object, object>
+            rightToleranceAlternativeIndexFactory?.TryGetAlternativeIndex<T, int, object, object>
             (
                 tolerantInterval.RightMain.Anchor,
                 null,
                 out int v2
-            )
+            ) ?? 
+            false
         )
         {
             IsRightTolerantIndexDefault = false;
@@ -95,7 +97,9 @@ public class BoundedSequence<T> : IReadOnlyList<T>
         }
     }
 
-    public T this[int index] => Premise.GetItem(index);
+    public T this[int index] => SequencePremise.GetItem(index);
+
+    public int GetIndex(T item) => SequenceItemToIndexPremise.GetIndex(item);
    
 
     public IEnumerator<T> GetEnumerator() => new Enumerator(this);
@@ -107,7 +111,7 @@ public class BoundedSequence<T> : IReadOnlyList<T>
         private readonly BoundedSequence<T> _innerSource;
 
         private bool _inited;
-        private T _current;
+        private int _currentIndex;
 
         public Enumerator(BoundedSequence<T> innerSource)
         {
@@ -115,8 +119,8 @@ public class BoundedSequence<T> : IReadOnlyList<T>
             Reset();
         }
 
-        public T Current => _current;
-        object IEnumerator.Current => Current!;
+        public T Current => _innerSource[_currentIndex];
+        object IEnumerator.Current => Current;
 
         public void Dispose()
         {
@@ -127,21 +131,27 @@ public class BoundedSequence<T> : IReadOnlyList<T>
             if (!_inited) 
             {
                 _inited = true;
+                return true;
             }
 
-            if (_innerSource.Premise.TryGetSuccessor(_current, out T? outSuccessor))
+            int nextIndex = _currentIndex + 1;
+            if
+            (
+                (_innerSource.LeastIndex <= nextIndex) &&
+                (nextIndex <= _innerSource.GreatestIndex)
+            )
             {
-                _current = outSuccessor;
+                _currentIndex = nextIndex;
+                return true;
             }
             
             return false;
         }
 
-        [MemberNotNull(nameof(_current))]
         public void Reset()
         {
             _inited = false;
-            _current = _innerSource[_innerSource.LeastIndex];
+            _currentIndex = _innerSource.LeastIndex;
         }
     }
 }

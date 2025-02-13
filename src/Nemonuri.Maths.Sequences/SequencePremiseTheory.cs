@@ -21,7 +21,7 @@ public static class SequencePremiseTheory
         }
     }
 
-    public static int GetIndex<T>(this IInversibleSequencePremise<T> self, T item)
+    public static int GetIndex<T>(this ISequenceItemToIndexPremise<T> self, T item)
 #if NET9_0_OR_GREATER
         where T : allows ref struct
 #endif

@@ -1,9 +1,8 @@
-using System.Collections;
-
 namespace Nemonuri.Maths.Sequences;
 
 public class EnumerableSuccessor<T> : IEnumerable<T>
 {
+    [NotNull]
     public T First {get;}
     public ISuccessorPremise<T> Premise {get;}
 
@@ -24,12 +23,13 @@ public class EnumerableSuccessor<T> : IEnumerable<T>
     {
         private readonly EnumerableSuccessor<T> _innerSource;
 
+        private bool _inited;
         private T _current;
 
         public Enumerator(EnumerableSuccessor<T> innerSource)
         {
             _innerSource = innerSource;
-            _current = _innerSource.First;
+            Reset();
         }
 
         public T Current => _current;
@@ -41,6 +41,12 @@ public class EnumerableSuccessor<T> : IEnumerable<T>
 
         public bool MoveNext()
         {
+            if (!_inited) 
+            {
+                _inited = true;
+                return true;
+            }
+
             if (_innerSource.Premise.TryGetSuccessor(_current, out T? outSuccessor))
             {
                 _current = outSuccessor;
@@ -49,8 +55,10 @@ public class EnumerableSuccessor<T> : IEnumerable<T>
             return false;
         }
 
+        [MemberNotNull(nameof(_current))]
         public void Reset()
         {
+            _inited = false;
             _current = _innerSource.First;
         }
     }

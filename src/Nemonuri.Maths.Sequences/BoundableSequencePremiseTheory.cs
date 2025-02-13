@@ -4,7 +4,7 @@ public static class BoundableSequencePremiseTheory
 {
     public static int GetCount<T>
     (
-        this IBoundableSequencePremise<T> premise,
+        this ISequenceBoundingPremise<T> premise,
         T leftBoundary, 
         BoundaryClosedDirection leftBoundaryClosedDirection, 
         T rightBoundary, 

@@ -1,22 +1,40 @@
 namespace Nemonuri.Maths.Sequences;
 
 #if NET7_0_OR_GREATER
-public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSequencePremise<TNumber>
+public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> : 
+    ISequencePremise<TNumber>,
+    ISequenceBoundingPremise<TNumber>,
+    ISequenceItemToIndexPremise<TNumber>
+
     where TNumber : IFloatingPoint<TNumber>
 {
     public TNumber ZeroIndex {get;}
     public TNumber Difference {get;}
     public Func<TNumber, int> IntegerizedRationalNumberToInt32Mapping {get;}
     public Func<int, TNumber> Int32ToPseudoIndexMapping {get;}
+    public ITolerantInterval<TNumber> TolerantInterval {get;}
+    public IExtraArgumentAttachedMapping<TNumber, object?, TNumber> NormalizedIndexMapping {get;}
+    public IAlternativeIndexFactory<TNumber, object?, TNumber> LeftToleranceAlternativeIndexFactory {get;}
+    public IAlternativeIndexFactory<TNumber, object?, TNumber> RightToleranceAlternativeIndexFactory {get;}
 
-    public BoundableRationalArithmeticSequencePremise
+    public TolerantBoundableRationalArithmeticSequencePremise
     (
         TNumber zeroIndex,  
         TNumber difference,
+
+        ITolerantInterval<TNumber> tolerantInterval,
+        IExtraArgumentAttachedMapping<TNumber, object?, TNumber> normalizedIndexMapping,
+        IAlternativeIndexFactory<TNumber, object?, TNumber> leftToleranceAlternativeIndexFactory,
+        IAlternativeIndexFactory<TNumber, object?, TNumber> rightToleranceAlternativeIndexFactory,
+
         Func<TNumber, int> integerizedRationalNumberToInt32Mapping,
         Func<int, TNumber> int32ToPseudoIndexMapping
     )
     {
+        Guard.IsNotNull(tolerantInterval);
+        Guard.IsNotNull(normalizedIndexMapping);
+        Guard.IsNotNull(leftToleranceAlternativeIndexFactory);
+        Guard.IsNotNull(rightToleranceAlternativeIndexFactory);
         Guard.IsNotNull(integerizedRationalNumberToInt32Mapping);
         Guard.IsNotNull(int32ToPseudoIndexMapping);
 
@@ -24,6 +42,10 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
         Difference = difference;
         IntegerizedRationalNumberToInt32Mapping = integerizedRationalNumberToInt32Mapping;
         Int32ToPseudoIndexMapping = int32ToPseudoIndexMapping;
+        TolerantInterval = tolerantInterval;
+        NormalizedIndexMapping = normalizedIndexMapping;
+        LeftToleranceAlternativeIndexFactory = leftToleranceAlternativeIndexFactory;
+        RightToleranceAlternativeIndexFactory = rightToleranceAlternativeIndexFactory;
     }
 
     public bool TryGetItem(int index, [NotNullWhen(true)] out TNumber? outItem)
@@ -35,19 +57,6 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
                 ZeroIndex,
                 Difference
             );
-
-        return true;
-    }
-
-    public bool TryGetSuccessor(TNumber? value, [NotNullWhen(true)] out TNumber? outSuccessor)
-    {
-        if (value is null)
-        {
-            outSuccessor = default;
-            return false;
-        }
-
-        outSuccessor = value + Difference;
 
         return true;
     }
@@ -88,6 +97,33 @@ public class BoundableRationalArithmeticSequencePremise<TNumber> : IBoundableSeq
         }
         
         return result;
+    }
+
+    public bool TryGetIndex(TNumber item, out int outIndex)
+    {
+        if
+        (
+            TolerantIntervalTheory.TryGetNormalizedIndex
+            (
+                item,
+
+                TolerantInterval,
+                NormalizedIndexMapping,
+                LeftToleranceAlternativeIndexFactory,
+                RightToleranceAlternativeIndexFactory,
+
+                out TNumber? outNormalizedIndex
+            )
+        )
+        {
+            outIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(outNormalizedIndex);
+            return true;
+        }
+        else
+        {
+            outIndex = default;
+            return false;
+        }
     }
 }
 #endif
