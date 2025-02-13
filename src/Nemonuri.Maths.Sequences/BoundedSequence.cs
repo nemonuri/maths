@@ -112,8 +112,7 @@ public class BoundedSequence<T> : IReadOnlyList<T>
         public Enumerator(BoundedSequence<T> innerSource)
         {
             _innerSource = innerSource;
-            _inited = false;
-            _current = _innerSource.ZeroIndex;
+            Reset();
         }
 
         public T Current => _current;
@@ -138,10 +137,11 @@ public class BoundedSequence<T> : IReadOnlyList<T>
             return false;
         }
 
+        [MemberNotNull(nameof(_current))]
         public void Reset()
         {
-            _inited = true;
-            _current = _innerSource.ZeroIndex;
+            _inited = false;
+            _current = _innerSource[_innerSource.LeastIndex];
         }
     }
 }
