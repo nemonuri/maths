@@ -1,29 +1,22 @@
 namespace Nemonuri.Maths.Sequences;
 
-public interface IInvertibleMappingPremise<TDomain, TCodomain>
-{
-    Func<TDomain, int> IntegerizedRationalNumberToInt32Mapping {get;}
-    Func<int, TDomain> Int32ToPseudoIndexMapping {get;}
-
-
-}
-
 #if NET7_0_OR_GREATER
 public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> : 
     ISequencePremise<TNumber>,
     ISequenceBoundingPremise<TNumber>,
-    ISequenceItemToIndexPremise<TNumber>
+    ISequenceItemToIndexPremise<TNumber>,
+    IInvertibleMappingPremise<TNumber, int>,
+    IPseudoIndexNormalizingPremise<TNumber>,
+    IToleranceAlternativeIndexFactoryPairProvider<TNumber, object, object>
 
     where TNumber : IFloatingPoint<TNumber>
 {
     public TNumber ZeroIndex {get;}
     public TNumber Difference {get;}
-    public Func<TNumber, int> IntegerizedRationalNumberToInt32Mapping {get;}
-    public Func<int, TNumber> Int32ToPseudoIndexMapping {get;}
     public ITolerantInterval<TNumber> TolerantInterval {get;}
-    public IExtraArgumentAttachedMapping<TNumber, object?, TNumber> NormalizedIndexMapping {get;}
-    public IAlternativeIndexFactory<TNumber, object?, TNumber> LeftToleranceAlternativeIndexFactory {get;}
-    public IAlternativeIndexFactory<TNumber, object?, TNumber> RightToleranceAlternativeIndexFactory {get;}
+    private readonly IPseudoIndexNormalizingPremise<TNumber> _pseudoIndexNormalizingPremise;
+    private readonly IInvertibleMappingPremise<TNumber, int> _innerIndexMappingPremise;
+    private readonly IToleranceAlternativeIndexFactoryPairProvider<TNumber, object, object> _innerToleranceAlternativeIndexFactoryPairProvider;
 
     public TolerantBoundableRationalArithmeticSequencePremise
     (
@@ -31,37 +24,33 @@ public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> :
         TNumber difference,
 
         ITolerantInterval<TNumber> tolerantInterval,
-        IExtraArgumentAttachedMapping<TNumber, object?, TNumber> normalizedIndexMapping,
-        IAlternativeIndexFactory<TNumber, object?, TNumber> leftToleranceAlternativeIndexFactory,
-        IAlternativeIndexFactory<TNumber, object?, TNumber> rightToleranceAlternativeIndexFactory,
-
-        Func<TNumber, int> integerizedRationalNumberToInt32Mapping,
-        Func<int, TNumber> int32ToPseudoIndexMapping
+        IPseudoIndexNormalizingPremise<TNumber> pseudoIndexNormalizingPremise,
+        IInvertibleMappingPremise<TNumber, int> innerIndexMappingPremise,
+        IToleranceAlternativeIndexFactoryPairProvider<TNumber, object, object> innerToleranceAlternativeIndexFactoryPairProvider
     )
     {
         Guard.IsNotNull(tolerantInterval);
-        Guard.IsNotNull(normalizedIndexMapping);
-        Guard.IsNotNull(leftToleranceAlternativeIndexFactory);
-        Guard.IsNotNull(rightToleranceAlternativeIndexFactory);
-        Guard.IsNotNull(integerizedRationalNumberToInt32Mapping);
-        Guard.IsNotNull(int32ToPseudoIndexMapping);
+        Guard.IsNotNull(pseudoIndexNormalizingPremise);
+        Guard.IsNotNull(innerToleranceAlternativeIndexFactoryPairProvider);
+        Guard.IsNotNull(innerIndexMappingPremise);
 
         ZeroIndex = zeroIndex;
         Difference = difference;
-        IntegerizedRationalNumberToInt32Mapping = integerizedRationalNumberToInt32Mapping;
-        Int32ToPseudoIndexMapping = int32ToPseudoIndexMapping;
         TolerantInterval = tolerantInterval;
-        NormalizedIndexMapping = normalizedIndexMapping;
-        LeftToleranceAlternativeIndexFactory = leftToleranceAlternativeIndexFactory;
-        RightToleranceAlternativeIndexFactory = rightToleranceAlternativeIndexFactory;
+        _pseudoIndexNormalizingPremise = pseudoIndexNormalizingPremise;
+        _innerIndexMappingPremise = innerIndexMappingPremise;
+        _innerToleranceAlternativeIndexFactoryPairProvider = innerToleranceAlternativeIndexFactoryPairProvider; 
     }
+
+    public IAlternativeIndexFactory<TNumber, object?, TNumber> LeftToleranceAlternativeIndexFactory => _innerToleranceAlternativeIndexFactoryPairProvider.LeftToleranceAlternativeIndexFactory;
+    public IAlternativeIndexFactory<TNumber, object?, TNumber> RightToleranceAlternativeIndexFactory => _innerToleranceAlternativeIndexFactoryPairProvider.RightToleranceAlternativeIndexFactory;
 
     public bool TryGetItem(int index, [NotNullWhen(true)] out TNumber? outItem)
     {
         outItem =
             RationalArithmeticSequenceTheory.GetItem
             (
-                Int32ToPseudoIndexMapping.Invoke(index),
+                this.InverseMap(index),
                 ZeroIndex,
                 Difference
             );
@@ -75,7 +64,7 @@ public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> :
 
         var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(leftBoundary, ZeroIndex, Difference);
         var v2 = TNumber.Ceiling(v1);
-        result = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
+        result = this.Map(v2);
         if 
         (
             leftBoundaryClosedDirection == BoundaryClosedDirection.Left &&
@@ -94,7 +83,7 @@ public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> :
         
         var v1 = RationalArithmeticSequenceTheory.GetPseudoIndex(rightBoundary, ZeroIndex, Difference);
         var v2 = TNumber.Floor(v1);
-        result = IntegerizedRationalNumberToInt32Mapping.Invoke(v2);
+        result = this.Map(v2);
         if 
         (
             rightBoundaryClosedDirection == BoundaryClosedDirection.Right &&
@@ -116,7 +105,7 @@ public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> :
                 item,
 
                 TolerantInterval,
-                NormalizedIndexMapping,
+                NormalizePseudoIndex,
                 LeftToleranceAlternativeIndexFactory,
                 RightToleranceAlternativeIndexFactory,
 
@@ -124,7 +113,7 @@ public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> :
             )
         )
         {
-            outIndex = IntegerizedRationalNumberToInt32Mapping.Invoke(outNormalizedIndex);
+            outIndex = this.Map(outNormalizedIndex);
             return true;
         }
         else
@@ -132,6 +121,21 @@ public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> :
             outIndex = default;
             return false;
         }
+    }
+
+    public bool TryInverseMap(int item, [NotNullWhen(true)] out TNumber? outResult)
+    {
+        return _innerIndexMappingPremise.TryInverseMap(item, out outResult);
+    }
+
+    public bool TryMap(TNumber item, [NotNullWhen(true)] out int outResult)
+    {
+        return _innerIndexMappingPremise.TryMap(item, out outResult);
+    }
+
+    public TNumber NormalizePseudoIndex(TNumber pseudoIndex)
+    {
+        return _pseudoIndexNormalizingPremise.NormalizePseudoIndex(pseudoIndex);
     }
 }
 #endif

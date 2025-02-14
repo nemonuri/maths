@@ -242,8 +242,11 @@ public static partial class TolerantIntervalTheory
         BoundaryClosedDirection rightToleranceBoundaryClosedDirection,
 #endregion Tolerant Interval
 
-        Func<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
-        TArg1? rawToNormalizedIndexMappingArg,
+#region Default Index Mapping
+        Func<TRaw, TPseudoIndex>? rawToNormalizedIndexMapping,
+        Func<TRaw, TArg1?, TPseudoIndex>? extraArg1AddedRawToNormalizedIndexMapping,
+        TArg1? extraArg1,
+#endregion Default Index Mapping
 
 #region Tolerance Alternative Index
         AlternativeIndexMode leftToleranceAlternativeIndexMode,
@@ -262,7 +265,7 @@ public static partial class TolerantIntervalTheory
         where TRaw : IComparable<TRaw>
         where TPseudoIndex : IComparable<TPseudoIndex>
     {
-        Guard.IsNotNull(rawToNormalizedIndexMapping);
+        Guard.IsNotNull(extraArg1AddedRawToNormalizedIndexMapping);
 
         //--- 날값의 구획상 위치 상태를 얻기 ---
         TolerantIntervalSectionKind sectionKind = 
@@ -296,7 +299,8 @@ public static partial class TolerantIntervalTheory
                 (
                     leftMainBoundary,
                     rawToNormalizedIndexMapping,
-                    rawToNormalizedIndexMappingArg,
+                    extraArg1AddedRawToNormalizedIndexMapping,
+                    extraArg1,
                     leftToleranceAlternativeIndexMode,
                     leftToleranceAlternativeIndex,
                     leftToleranceAlternativeMapping,
@@ -313,7 +317,8 @@ public static partial class TolerantIntervalTheory
                 (
                     rightMainBoundary,
                     rawToNormalizedIndexMapping,
-                    rawToNormalizedIndexMappingArg,
+                    extraArg1AddedRawToNormalizedIndexMapping,
+                    extraArg1,
                     rightToleranceAlternativeIndexMode,
                     rightToleranceAlternativeIndex,
                     rightToleranceAlternativeMapping,
@@ -334,7 +339,7 @@ public static partial class TolerantIntervalTheory
             )
         )
         {
-            outNormalizedIndex = rawToNormalizedIndexMapping(rawValue, rawToNormalizedIndexMappingArg);
+            outNormalizedIndex = extraArg1AddedRawToNormalizedIndexMapping(rawValue, extraArg1);
             return true;
         }
         //---|
@@ -370,7 +375,9 @@ public static partial class TolerantIntervalTheory
         ITolerantInterval<TRaw> tolerantInterval,
 #endregion Tolerant Interval
 
+#region Default Index Mapping
         IExtraArgumentAttachedMapping<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
+#endregion Default Index Mapping
 
 #region Tolerance Alternative Index
         IAlternativeIndexFactory<TRaw, TArg2?, TPseudoIndex> leftToleranceAlternativeIndexFactory,
@@ -396,8 +403,69 @@ public static partial class TolerantIntervalTheory
                 rightToleranceBoundary: tolerantInterval.RightTolerance.Anchor,
                 rightToleranceBoundaryClosedDirection: tolerantInterval.RightTolerance.ClosedDirection,
 
-                rawToNormalizedIndexMapping: rawToNormalizedIndexMapping.Mapping,
-                rawToNormalizedIndexMappingArg: rawToNormalizedIndexMapping.ExtraArgument,
+                rawToNormalizedIndexMapping: null,
+                extraArg1AddedRawToNormalizedIndexMapping: rawToNormalizedIndexMapping.Mapping,
+                extraArg1: rawToNormalizedIndexMapping.ExtraArgument,
+
+                leftToleranceAlternativeIndexMode: leftToleranceAlternativeIndexFactory.Mode,
+                leftToleranceAlternativeIndex: leftToleranceAlternativeIndexFactory.AlternativeIndex,
+                leftToleranceAlternativeMapping: leftToleranceAlternativeIndexFactory.AlternativeMapping?.Mapping,
+                leftToleranceAlternativeMappingArg: leftToleranceAlternativeIndexFactory.AlternativeMapping is {} v1 ? v1.ExtraArgument : default,
+                
+                rightToleranceAlternativeIndexMode: rightToleranceAlternativeIndexFactory.Mode,
+                rightToleranceAlternativeIndex: rightToleranceAlternativeIndexFactory.AlternativeIndex,
+                rightToleranceAlternativeMapping: rightToleranceAlternativeIndexFactory.AlternativeMapping?.Mapping,
+                rightToleranceAlternativeMappingArg: rightToleranceAlternativeIndexFactory.AlternativeMapping is {} v2 ? v2.ExtraArgument : default,
+
+                out outNormalizedIndex
+            );
+    }
+
+    public static bool TryGetNormalizedIndex
+    <
+        TRaw,
+        TPseudoIndex,
+        TArg2,
+        TArg3
+    >
+    (
+        TRaw rawValue,
+
+#region Tolerant Interval
+        ITolerantInterval<TRaw> tolerantInterval,
+#endregion Tolerant Interval
+
+#region Default Index Mapping
+        Func<TRaw, TPseudoIndex> rawToNormalizedIndexMapping,
+#endregion Default Index Mapping
+
+#region Tolerance Alternative Index
+        IAlternativeIndexFactory<TRaw, TArg2?, TPseudoIndex> leftToleranceAlternativeIndexFactory,
+        IAlternativeIndexFactory<TRaw, TArg3?, TPseudoIndex> rightToleranceAlternativeIndexFactory,
+#endregion Tolerance Alternative Index
+
+        [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
+    )
+        where TRaw : IComparable<TRaw>
+        where TPseudoIndex : IComparable<TPseudoIndex>
+    {
+        return
+            TryGetNormalizedIndex
+            (
+                rawValue: rawValue,
+
+                leftToleranceBoundary: tolerantInterval.LeftTolerance.Anchor,
+                leftToleranceBoundaryClosedDirection: tolerantInterval.LeftTolerance.ClosedDirection,
+                leftMainBoundary: tolerantInterval.LeftMain.Anchor,
+                leftMainBoundaryClosedDirection: tolerantInterval.LeftMain.ClosedDirection,
+                rightMainBoundary: tolerantInterval.RightMain.Anchor,
+                rightMainBoundaryClosedDirection: tolerantInterval.RightMain.ClosedDirection,
+                rightToleranceBoundary: tolerantInterval.RightTolerance.Anchor,
+                rightToleranceBoundaryClosedDirection: tolerantInterval.RightTolerance.ClosedDirection,
+
+                rawToNormalizedIndexMapping: rawToNormalizedIndexMapping,
+                extraArg1AddedRawToNormalizedIndexMapping: null,
+                extraArg1: default(object),
 
                 leftToleranceAlternativeIndexMode: leftToleranceAlternativeIndexFactory.Mode,
                 leftToleranceAlternativeIndex: leftToleranceAlternativeIndexFactory.AlternativeIndex,
@@ -432,8 +500,11 @@ public static partial class TolerantIntervalTheory
         BoundaryClosedDirection rightBoundaryClosedDirection,
 #endregion Interval
 
-        Func<TRaw, TArg1?, TPseudoIndex> rawToNormalizedIndexMapping,
-        TArg1? rawToNormalizedIndexMappingArg,
+#region Default Index Mapping
+        Func<TRaw, TPseudoIndex>? rawToNormalizedIndexMapping,
+        Func<TRaw, TArg1?, TPseudoIndex> extraArg1AddedRawToNormalizedIndexMapping,
+        TArg1? extraArg1,
+#endregion Default Index Mapping
 
         [NotNullWhen(true)] out TPseudoIndex? outNormalizedIndex
     )
@@ -455,7 +526,8 @@ public static partial class TolerantIntervalTheory
                 rightToleranceBoundaryClosedDirection: rightBoundaryClosedDirection,
 
                 rawToNormalizedIndexMapping: rawToNormalizedIndexMapping,
-                rawToNormalizedIndexMappingArg: rawToNormalizedIndexMappingArg,
+                extraArg1AddedRawToNormalizedIndexMapping: extraArg1AddedRawToNormalizedIndexMapping,
+                extraArg1: extraArg1,
 
                 leftToleranceAlternativeIndexMode: AlternativeIndexMode.Default,
                 leftToleranceAlternativeIndex: default,
