@@ -1,5 +1,13 @@
 namespace Nemonuri.Maths.Sequences;
 
+public interface IInvertibleMappingPremise<TDomain, TCodomain>
+{
+    Func<TDomain, int> IntegerizedRationalNumberToInt32Mapping {get;}
+    Func<int, TDomain> Int32ToPseudoIndexMapping {get;}
+
+
+}
+
 #if NET7_0_OR_GREATER
 public class TolerantBoundableRationalArithmeticSequencePremise<TNumber> : 
     ISequencePremise<TNumber>,
