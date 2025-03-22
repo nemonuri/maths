@@ -14,6 +14,8 @@ public readonly ref struct PermutationGroup
 
     public int Length => _innerPermutationGroup.Length;
 
+    public bool IsEmpty => _innerPermutationGroup.IsEmpty;
+
     public PermutationGroup GetInversePermutationGroup(Span<int> destination)
     {
         Guard.IsGreaterThanOrEqualTo(destination.Length, Length);
@@ -30,6 +32,18 @@ public readonly ref struct PermutationGroup
         return new PermutationGroup(slicedDestination);
     }
 
+    public bool TryGetInversePermutationGroup(Span<int> destination, out PermutationGroup permutationGroup)
+    {
+        if (!IsEmpty)
+        {
+            permutationGroup = default;
+            return false;
+        }
+
+        permutationGroup = GetInversePermutationGroup(destination);
+        return true;
+    }
+
     public void Apply<T>(ReadOnlySpan<T> source, Span<T> destination)
         where T : unmanaged
     {
@@ -41,6 +55,18 @@ public readonly ref struct PermutationGroup
         );
     }
 
+    public bool TryApply<T>(ReadOnlySpan<T> source, Span<T> destination)
+        where T : unmanaged
+    {
+        if (IsEmpty) 
+        {
+            return false;
+        }
+
+        Apply(source, destination);
+        return true;
+    }
+
     public void Apply<T>(ReadOnlySpan<T> source, Span<T> destination, Span<T> intermediate)
     {
         PermutationTheory.ApplyMultiProjection
@@ -50,5 +76,16 @@ public readonly ref struct PermutationGroup
             _innerPermutationGroup,
             destination
         );
+    }
+
+    public bool TryApply<T>(ReadOnlySpan<T> source, Span<T> destination, Span<T> intermediate)
+    {
+        if (IsEmpty) 
+        {
+            return false;
+        }
+
+        Apply(source, destination, intermediate);
+        return true;
     }
 }
